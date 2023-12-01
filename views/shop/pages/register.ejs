@@ -1,0 +1,202 @@
+
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card mt-3">
+                <div class="card-header">
+                    <h3 class="font-weight-bolder">Sign Up</h3>
+                </div>
+                <div class="card-body">
+                    <form method="post" action="/register" id="registrationForm">
+                        <div class="form-group">
+                            <label for="name">Name</label>
+                            <input type="text" class="form-control" name="name" placeholder="Enter your name" value="<%= data?.name %>" 
+                            required>
+                            <p class="text-danger" id="nameError"></p>
+                        </div>
+
+                        <div class="form-group mt-3">
+                            <label for="email">Email</label>
+                            <input type="email" class="form-control" name="email" placeholder="Enter your email" value="<%= data?.email %>"
+                            required>
+                            <p class="text-danger" id="emailError"></p>
+                        </div>
+
+
+                        <div class="form-group mt-3">
+                            <label for="password">Password</label>
+                            <input type="password" class="form-control" name="password" placeholder="Enter your password" 
+                            required>
+                            <p class="text-danger" id="passwordError"></p>
+                        </div>
+
+
+                        <div class="form-group mt-3">
+                            <label for="confirmPassword">Confirm Password</label>
+                            <input type="password" class="form-control" name="confirm-password" placeholder="Confirm your password" required>
+                            <p class="text-danger" id="confirmPasswordError"></p>
+                        </div>
+
+                        <div class="button-box">
+                        <button type="submit" class="btn btn-dark btn-round mt-3" id="registerButton">Sign Up</button>
+                        <p class="text-danger" id="formErrorMessage"></p>
+                    </div>
+                        <%- include('../partials/flash_msg') %>
+                    </form>
+                </div>
+                <div class="card-footer">
+                    Already have an account? <a href="/login">Login</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+      const registrationForm = document.getElementById("registrationForm");
+      const nameInput = document.querySelector('input[name="name"]');
+      const emailInput = document.querySelector('input[name="email"]');
+      const mobileInput = document.querySelector('input[name="mobile"]');
+      const passwordInput = document.querySelector('input[name="password"]');
+      const confirmPasswordInput = document.querySelector(
+        'input[name="confirm-password"]'
+      );
+
+    const registerButton = document.getElementById("registerButton");
+    const nameError = document.getElementById("nameError");
+    const emailError = document.getElementById("emailError");
+    const mobileError = document.getElementById("mobileError");
+    const passwordError = document.getElementById("passwordError");
+    const confirmPasswordError = document.getElementById(
+      "confirmPasswordError"
+    );
+    const formErrorMessage = document.getElementById("formErrorMessage");
+
+        // Regular expressions for validation
+        const nameRegex = /^[a-zA-Z]+$/;
+    const emailRegex = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/;
+    
+   
+
+    // Function to validate name
+    function validateFirstName() {
+      const nameError = document.getElementById("nameError");
+      const nameValue = firstNameInput.value.trim();
+      if (nameValue === " ") {
+        nameError.textContent = "First name is required";
+      } else if (!nameRegex.test(nameValue)) {
+        nameError.textContent = "First name can only contain alphabets";
+      } else {
+        nameError.textContent = " ";
+      }
+    }
+
+    // Add a blur event listener to the nameInput
+    NameInput.addEventListener("blur", validateName);
+
+     // Function to validate email
+     function validateEmail() {
+      const emailError = document.getElementById("emailError");
+      const emailValue = emailInput.value.trim();
+      if (!emailRegex.test(emailValue)) {
+        emailError.textContent = "Invalid email address";
+      } else {
+        emailError.textContent = "";
+
+        // You can add the fetch request here for email availability check.
+        fetch("/auth/check-email", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ email: emailValue }),
+        })
+          .then((response) => {
+            if (response.ok) {
+              return response.json();
+            } else {
+              throw new Error("Network response was not ok");
+            }
+          })
+          .then((data) => {
+            if (data.message === "email already registered") {
+              emailError.textContent = data.message;
+            }
+          })
+          .catch((error) => {
+            console.error("An error occurred:", error);
+          });
+      }
+    }
+
+    // Add a blur event listener to the emailInput
+    emailInput.addEventListener("blur", validateEmail);
+
+      // Function to validate password
+      function validatePassword() {
+      const passwordError = document.getElementById("passwordError");
+      const passwordValue = passwordInput.value;
+      if (passwordValue.length < 6) {
+        passwordError.textContent =
+          "Password must be at least 6 characters long";
+      } else {
+        passwordError.textContent = "";
+      }
+    }
+
+    // Add a blur event listener to the passwordInput
+    passwordInput.addEventListener("blur", validatePassword);
+
+    // Function to validate confirm password
+    function validateConfirmPassword() {
+      const confirmPasswordError = document.getElementById(
+        "confirmPasswordError"
+      );
+      const passwordValue = passwordInput.value;
+      const confirmPasswordValue = confirmPasswordInput.value;
+      if (confirmPasswordValue !== passwordValue) {
+        confirmPasswordError.textContent = "Passwords do not match";
+      } else {
+        confirmPasswordError.textContent = "";
+      }
+    }
+
+    // Add a blur event listener to the confirmPasswordInput
+    confirmPasswordInput.addEventListener("blur", validateConfirmPassword);
+
+    // Function to handle form submission
+    function handleSubmit(event) {
+      event.preventDefault();
+
+      validateName();
+      validateEmail();
+      validatePassword();
+      validateConfirmPassword();
+
+      const allErrors = [
+        document.getElementById("NameError").textContent,
+        document.getElementById("emailError").textContent,
+        document.getElementById("passwordError").textContent,
+        document.getElementById("confirmPasswordError").textContent,
+      ];
+
+      if (allErrors.every((error) => error === "")) {
+        // All fields are valid, you can submit the form
+        formErrorMessage.textContent = "";
+        registrationForm.submit();
+      } else {
+        // Some fields are invalid, display an error message
+        formErrorMessage.textContent = "Please correct the errors in the form.";
+      }
+    }
+
+    // Add a submit event listener to the registrationForm
+    registrationForm.addEventListener("submit", handleSubmit);
+  });
+</script>
+
+    
+

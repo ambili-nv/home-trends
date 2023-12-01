@@ -1,0 +1,64 @@
+<section class="content-main" style="margin-left: 250px;">
+    <div class="content-header">
+        <div>
+            <h2 class="content-title card-title">Categories </h2>
+        </div>
+        <div>
+           <a href="/admin/addcategory" class="btn btn-primary btn-sm-rounded">Create New</a>
+        </div>
+    </div>
+        <div class="card-body">
+                        <table class="table table-bordered">
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Name</th>
+                                    <th>List / Unlist</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <% categories.forEach((category, index) => { %>
+                                    <tr>
+                                      <td><%= index + 1 %></td>
+                                      <td><%= category.title%></td>
+                                      <td>
+                                        <% if(category.isListed) { %>
+                                          List
+                                        <% } else { %>
+                                          Not Listed
+                                        <% } %>
+                                        <% if (category.isListed) { %>
+                                        <form method="post" action="/admin/unlist/<%= category._id %>?_method=PUT">
+                                          <button type="submit" class="btn btn-sm btn-success">
+                                            <i class='bx bxs-message-square-check' ></i>
+                                          </button>
+                                        </form>
+                                        <% } else { %>
+                                        <form method="post" action="/admin/list/<%= category._id %>?_method=PUT">
+                                          <button type="submit" class="btn btn-sm btn-danger">
+                                            <i class='bx bxs-message-square-x'></i>
+                                          </button>
+                                        </form>
+                                        <% } %>
+                                      </td>
+                                      
+                                      <td>
+                                        <div class="d-flex" >
+                                          <a href="/admin/edit/<%= category._id %>" class="btn btn-sm btn-primary ml-2 mr-1" >
+                                            <i class='bx bxs-edit'></i>
+                                          </a>
+                                          <form action="/admin/delete/<%= category._id %>?_method=DELETE" method="post">
+                                            <button type="submit" class="btn btn-xsm btn-danger ml-1">
+                                              <i class='bx bxs-trash' ></i>
+                                            </button>
+                                          </form>
+                                        </div>
+                                      </td>
+                                    </tr>
+                                <% }) %>
+                               
+                            </tbody>
+                        </table>
+                    </div>
+</section> 

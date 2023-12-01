@@ -1,0 +1,71 @@
+<style>
+    /* Additional custom styles */
+    body {
+      background-color: #f8f9fa;
+    }
+    .container {
+      background-color: #fff;
+      padding: 40px;
+      border-radius: 8px;
+      box-shadow: 0px 0px 15px 0px rgba(0,0,0,0.1);
+    }
+    .form-group label {
+      font-weight: bold;
+    }
+    .btn-primary {
+      background-color: #007bff;
+      border-color: #007bff;
+    }
+    .btn-primary:hover {
+      background-color: #0056b3;
+      border-color: #0056b3;
+    }
+  </style>
+</head>
+<body>
+  <div class="container mt-5">
+    <!-- <h2 class="mb-4">Add New Address</h2> -->
+
+    <!-- Address Form -->
+    <form action="/address/edit/<%= address._id %>/?_method=PUT" method="post" method="post">
+      <div class="row">
+        <div class="col-md-6">
+          <div class="form-group">
+            <label for="inputName">Name</label>
+            <input type="text" class="form-control" id="name" name="name"   value="<%= address.name %>" placeholder="Enter Name" required>
+          </div>
+          <div class="form-group">
+            <label for="inputStreet">Street</label>
+            <input type="text" class="form-control" id="street" name="street" value="<%= address.street %>" placeholder="Enter Street" required>
+          </div>
+          <div class="form-group">
+            <label for="inputCity">City</label>
+            <input type="text" class="form-control" id="city" name="city"  value="<%= address.city %>" placeholder="Enter City" required>
+          </div>
+          <div class="form-group">
+            <label for="inputState">State</label>
+            <input type="text" class="form-control" id="state" name="state"  value="<%= address.pincode %>" placeholder="Enter State" required>
+          </div>
+        </div>
+        <div class="col-md-6">
+          <div class="form-group">
+            <label for="inputPincode">Pincode</label>
+            <input type="text" class="form-control" id="pincode" name="pincode" value="<%= address.pincode %>" placeholder="Enter Pincode" required>
+          </div>
+          <div class="form-group">
+            <label for="inputLandmark">Landmark</label>
+            <input type="text" class="form-control" id="landmark" name="landmark" value="<%= address.landmark %>" placeholder="Enter Landmark">
+          </div>
+          <div class="form-group">
+            <label for="inputMobile">Mobile Number</label>
+            <input type="tel" class="form-control" id="mobile" name="mobile"  value="<%= address.mobile %>" placeholder="Enter Mobile Number" required>
+          </div>
+          <div class="form-group">
+            <label for="inputAltMobile">Alternative Mobile Number</label>
+            <input type="tel" class="form-control" id="alternativenumber"  name="alternativenumber" value="<%= address.alternativenumber %>" placeholder="Enter Alternative Mobile Number">
+          </div>
+        </div>
+      </div>
+      <button type="submit" class="btn btn-primary">Save Address</button>
+    </form>
+  </div>

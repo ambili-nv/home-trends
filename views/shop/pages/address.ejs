@@ -1,0 +1,34 @@
+<%- include('../partials/header') %>
+<div class="container mt-5">
+    <h2 class="mb-4">Manage Addresses</h2>
+
+    <!-- Address Display -->
+    <div id="addressContainer">
+      <!-- Address Cards will be dynamically inserted here -->
+     
+
+      <% if (address && address.length) { %> <% address.forEach(item => { %>
+      <div class="card mb-4">
+        <div class="card-body shadow">
+            <h5 class="card-title"><%= item.title %></h5>
+            <p class="card-text"><%= item.name %></p>
+            <p class="card-text"><%= item.street %>,<%= item.city %>,<%= item.state %>,<%= item.pincode %></p>
+            <p class="card-text"><%= item.landmark %></p>
+            <p class="card-text"><%= item.mobile %></p>
+            <p class="card-text"><%= item.alternativenumber %></p>
+
+          <a href="/address/edit/<%= item._id %>" class="btn btn-sm btn-primary mr-2">Edit</a>
+          
+         
+        </div>
+
+
+      </div>
+      <% }) %> <% } else { %> No Address <% } %>
+    </div>
+
+    <!-- Add New Address Button -->
+    <div class="d-flex justify-content-between align-items-center mb-4 mt-5">
+      
+      <a href="/add-address" class="btn btn-primary btn-sm rounded">Add Address </a>
+    </div>

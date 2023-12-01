@@ -1,0 +1,88 @@
+<style>
+    .image{
+        width: 150px;
+        height: 150px;
+    }
+</style>
+<div class="container mt-5">
+    <div class="card">
+      <div class="card-header">
+        <strong>Order Details</strong>
+      </div>
+      <div class="card-body">
+        <div class="row">
+          <div class="col-md-6">
+            <img
+              src="<%= order.product.images[0].thumbnailUrl %>"
+              class="image"
+              alt="Product Image"
+            />
+  
+            <p><strong>Order ID:</strong><%= order.orderId %></p>
+            <p><strong>Product Name:</strong> <%= order.product.title %></p>
+            <p>
+              <strong>Shipping Address:</strong> <%= order.shippingAddress %>, <%= order.street %>, <%= order.city %>, <%= order.state %>, <%= order.zip %>
+            </p>
+            <p><strong>Price:</strong> ₹<%= order.price %></p>
+            <p>
+              <strong>Ordered Date:</strong> <%= new Date(order.orderedDate).toUTCString() %>
+            </p>
+            <% if (order.status === "Shipped") { %>
+              <p>
+                <strong>Shipped Date:</strong> <%= new Date(order.shippedDate).toUTCString() %>
+              </p>
+            <% } else if (order.status === "Delivered") { %>
+              <p>
+                <strong>Delivery Date:</strong> <%= new Date(order.deliveredDate).toUTCString() %>
+              </p>
+            <% } %>
+  
+            <p><strong>Product Quantity:</strong> <%= order.quantity %></p>
+            <p>
+              <strong>Order Status:</strong> <% if (order.status==='Pending' ) { %>
+                <span class="text-warning"> <%= order.status %> </span>
+              <% } else if (order.status==='Shipped' ) { %>
+                <span class="text-primary"> <%= order.status %> </span>
+              <% } else if (order.status==='Cancelled' || order.status==='Return Requested' ) { %>
+                <span class="text-danger"> <%= order.status %> </span>
+              <% } else if (order.status==='Delivered' ) { %>
+                <span class="text-success"> <%= order.status %> </span>
+              <% } %>
+            </p>
+            <% if (order.status !== "Cancelled" ) { %>
+              <button
+                class="btn btn-danger h-auto"
+                data-toggle="modal"
+                data-target="#cancelOrderModal"
+              >
+                Cancel Order
+              </button>
+            <% } %>
+  
+            <div class="modal fade" id="cancelOrderModal" tabindex="-1" role="dialog" aria-labelledby="cancelOrderModalLabel" aria-hidden="true">
+              <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                  <div class="modal-header">
+                    <h5 class="modal-title" id="cancelOrderModalLabel">Confirm Cancellation</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                      <span aria-hidden="true">&times;</span>
+                    </button>
+                  </div>
+                  <div class="modal-body">
+                    Are you sure you want to cancel this order?
+                  </div>
+                  <div class="modal-footer">
+                    <form action="/orders/single/<%= order._id %>?_method=PUT" method="post">
+                      <button type="submit" class="btn btn-danger">Confirm</button>
+                    </form>
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  

@@ -1,0 +1,90 @@
+<section class="content-main" style="margin-left: 250px;">
+    <div class="content-header">
+        <div>
+            <h2 class="content-title card-title">Products List</h2>
+        </div>
+        <div>
+            <a href="/admin/addnewproduct" class="btn btn-primary btn-sm rounded">Create new</a>
+        </div>
+    </div>
+    <div class="card mb-4">
+        <header class="card-header">
+            
+        </header> 
+        <div class="card-body">
+          <%- include('../partials/flash-message.ejs') %>
+            <table class="table table-bordered">
+                <thead>
+                    <tr>
+                        <th>S.No</th>
+                       <th>Product Name</th>
+                       <th>Category</th>
+                       <th>Description</th>
+                       <th>Sales Price</th>
+                       <th>Product Price</th>
+                       <th>Quantity</th>
+                       <th>Images</th>
+                       <th>Actions</th> 
+                    </tr>
+                </thead>
+                <tbody>
+                    <% products.forEach((product, index) => { %>
+                        <tr>
+                          <td><%= index + 1 %></td>
+                          <td>
+                            <% if (product.title.length > 10) { %> <%=
+                            product.title.substring(0, 10) + "..." %> <% } else { %> <%=
+                            product.title %> <% } %>
+                          </td>
+                          <td><%= product?.category?.title %></td>
+                          <td><% if (product.description.length > 10) { %> <%=
+                            product.description.substring(0, 10) + '...' %> <% } else { %> <%=
+                            product.description %> <% } %>
+                          </td>
+                          <td>$<%= product.salePrice %></td>
+                          <td>$<%= product.productPrice %></td>
+                          <td><%= product.quantity %></td>
+                          <td class="align-middle">
+                            <img class="img-fluid img-thumbnail" src="<%= product?.images[0]?.thumbnailUrl %>" alt="" style="width: 100px; height: 100px;">
+                          </td>                      
+                          <td>
+                            <div class="btn-group" role="group" aria-label="Product Actions">
+                              <a
+                                href="/admin/editproduct/<%= product._id %>"
+                                class="btn btn-sm btn-primary ml-2 mr-1"
+                                <i class='bx bxs-edit'></i>Edit
+                              </a>
+                              
+                               
+                              <% if (product.isListed) { %>
+                              <form
+                                method="post"
+                                action="/admin/product/unlist/<%= product._id %>?_method=PUT"
+                              >
+                                <button type="submit" class="btn btn-lg btn-success">
+                                  <i class='bx bxs-message-square-check'></i>
+                                </button>
+                              </form>
+                              <% } else { %>
+                              <form
+                                method="post"
+                                action="/admin/product/list/<%= product?._id %>?_method=PUT"
+                              >
+                                <button type="submit" class="btn  btn-danger">
+                                  <i class='bx bxs-message-square-x'></i>
+                                </button>
+                              </form>
+                              <% } %>
+                            </div>
+                          </td>
+                        </tr>
+                        <% }) %>
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              </div>
+            </tbody>
+          </table>
+        </div>
+</section>

@@ -1,0 +1,36 @@
+
+
+
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card mt-5">
+                <div class="card-header">
+                    <h3 class="font-weight-bolder">Login</h3>
+                </div>
+                <div class="card-body">
+                    <form method="post" action="/login" id="loginform">
+                        <div class="form-group">
+                            <label for="name">Username or Email</label>
+                            <input type="text" class="form-control" id="name" placeholder="Enter your username or email"  name="email">
+                        </div>
+                       
+                        <div class="form-group mt-3">
+                            <label for="password">Password</label>
+                            <input type="password" class="form-control" id="password" placeholder="Enter your password" name="password" required>
+                        </div>
+                       
+
+
+                        <button type="submit" class="btn btn-dark btn-round mt-3" value="login">Login</button>
+                        <%- include('../partials/flash_msg') %>
+                    </form>
+                    
+                </div>
+                <div class="card-footer">
+                    Don't have an account? <a href="/register">Sign Up</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

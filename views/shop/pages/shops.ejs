@@ -1,0 +1,206 @@
+<%- include('../partials/header') %>
+    <div class="shop-page-wrapper shop-page-padding ptb-100">
+        <div class="container-fluid">
+            <div class="row gy-5">
+                <div class="col-lg-3 order-2 order-lg-1">
+                    <div class="shop-sidebar mr-50">
+                        <div class="sidebar-widget mb-50">
+                            <%- include('../partials/flash_msg') %>
+                            <h3 class="sidebar-title">Search Products</h3>
+                            <div class="sidebar-search">
+                                <form action="/shops">
+                                    <input placeholder="Search Products..." type="text">
+                                    <button><i class="ti-search"></i></button>
+                                </form>
+                            </div>
+                        </div>
+                        <div class="sidebar-widget mb-40">
+                            <h3 class="sidebar-title">Filter by Price</h3>
+                            <div class="price_filter">
+                                <div id="slider-range"></div>
+                                <div class="price_slider_amount">
+                                    <div class="label-input">
+                                        <label>price : </label>
+                                        <input type="text" id="amount" name="price" placeholder="Add Your Price" />
+                                    </div>
+                                    <button type="button">Filter</button>
+                                </div>
+                            </div>
+                        </div>
+
+                        
+
+                        <div class="sidebar-widget mb-45">
+                            <h3 class="sidebar-title">Categories</h3>
+                            <div class="sidebar-categories">
+                                <ul>
+                                
+
+                                    <% categories.forEach(category=> { %> <% if (category.title
+                                            !==products?.category?.title) { %>
+                                            <li><a href="">
+                                                    <%= category.title %>
+                                                </a>
+                                            </li>
+
+                                            <% } %>
+                                                <% }) %>
+
+
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+
+
+                <div class="col-lg-9 order-1 order-lg-2">
+                    <div class="shop-product-wrapper res-xl res-xl-btn">
+                        <div class="shop-bar-area">
+                            <div class="shop-bar pb-60">
+                                <div class="shop-found-selector">
+                                    <div class="shop-found">
+                                        <p><span>23</span> Product Found of <span>50</span></p>
+                                    </div>
+                                    <div class="shop-selector">
+                                        <label>Sort By : </label>
+                                        <select name="select">
+                                            <option value="">Default</option>
+                                            <option value="">A to Z</option>
+                                            <option value=""> Z to A</option>
+                                            <option value="">In stock</option>
+                                        </select>
+                                    </div>
+                                </div>
+
+
+
+                            </div>
+
+
+
+                            <div class="shop-product-content tab-content">
+                                <div id="grid-sidebar1" class="tab-pane fade active show">
+                                    <div class="row">
+
+                                        <% products.forEach(product=> { %>
+                                            <div class="col-lg-6 col-md-6 col-xl-3">
+                                                <div class="product-wrapper mb-30">
+                                                    <div class="product-img">
+                                                        <a href="/product/<%= product._id %>">
+
+                                                            <img src="<%= product.images[0].thumbnailUrl %>"
+                                                                alt="<%= product.title %>" width="200px"
+                                                                height="310px" />
+                                                        </a>
+
+
+                                                        <div class="product-action">
+
+                                                            <a class="animate-left" title="Wishlist" href="#">
+                                                                <i class="pe-7s-like"></i>
+                                                            </a>
+
+                                                          
+                                                            <% if (product.quantity) { %>
+                                                                <a
+                                                                  class="animate-top"
+                                                                  title="Add To Cart"
+                                                                  onclick="addToCart(`<%= product._id %>`)"
+                                                                  
+                                                                >
+                                                                  <i class="pe-7s-cart"></i>
+                                                                </a>
+                                                                <% } %>
+
+                                                                    <!-- <a class="animate-right" title="Quick View"
+                                                                data-bs-toggle="modal" data-bs-target="#exampleModal"
+                                                                href="#">
+                                                                <i class="pe-7s-cart"></i>
+                                                            </a> -->
+
+
+
+                                                        </div>
+                                                    </div>
+
+
+
+                                                    <div class="product-content">
+                                                        <div class="d-flex justify-content-between">
+                                                            <medium class="card-title font-weight-bold"
+                                                                style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap">
+                                                                <%= product.title %>
+                                                                    <h6 class="small">
+                                                                        <!-- Category:<%=product?.Category?.title %> -->
+                                                                        <%= product.description %>
+                                                                    </h6>
+                                                            </medium>
+                                                        </div>
+
+                                                        <div class="d-flex justify-content-between">
+                                                            <span class="text-decoration-line-through text-secondary">₹
+                                                                <%= product.productPrice %>
+                                                            </span>
+                                                            <span class="card-text h4">₹ <%= product.salePrice %></span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <% }) %>
+                                    </div>
+                                </div>
+
+
+
+
+                            
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <script>
+                    function addToCart(id) {
+                        const productId = id;
+                        const url = `/cart/add/${productId}`;
+                        const cartCount = document.getElementById("cartCount");
+                        const cartMessage = document.getElementById("cart-message");
+
+                        fetch(url, {
+                            method: "GET",
+                        })
+                            .then((response) => {
+                                if (response.ok) {
+                                    return response.json(); // Assuming server sends JSON
+                                } else {
+                                    console.error("Failed");
+                                }
+                            })
+                            .then((data) => {
+                                if (data) {
+                                    console.log(data["message"]);
+
+                                    // Check if 'count' and 'message' properties exist in data
+                                    if (data.count && data.message) {
+                                        cartCount.innerText = data.count;
+                                        cartMessage.innerText = data.message;
+
+                                        cartMessage.className = `position-fixed bg-${data.status} text-white p-2 rounded`;
+                                        cartMessage.style.display = "block";
+
+                                        setTimeout(function () {
+                                            cartMessage.style.display = "none";
+                                        }, 3000);
+                                    } else {
+                                        console.error("Unexpected data format");
+                                    }
+                                }
+                            })
+                            .catch((error) => {
+                                console.error("An error occurred:", error);
+                            });
+                    }
+
+                </script>

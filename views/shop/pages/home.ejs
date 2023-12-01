@@ -1,0 +1,305 @@
+<%- include('../partials/header') %>
+    <div class="slider-area">
+        <div class="slider-active owl-carousel">
+            <div class="single-slider-4 slider-height-6 bg-img"
+                style="background-image: url(shop/assets/img/slider/9.jpg)">
+                <div class="container">
+                    <div class="row">
+                        <div class="ms-auto col-lg-6">
+                            <div class="furniture-content fadeinup-animated">
+                                <h2 class="animated">Comfort <br>Collection.</h2>
+                                <p class="animated">Lorem Ipsum is simply dummy text of the printing and typesetting
+                                    industry.</p>
+                                <a class="furniture-slider-btn btn-hover animated" href="product-details.html">Shop Now</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- product area start -->
+    <!-- <div class="popular-product-area wrapper-padding-3 pt-115 pb-115">
+        <div class="container-fluid">
+            <div class="section-title-6 text-center mb-50">
+                <h2>Popular Product</h2>
+            </div>
+
+            <div class="product-style">
+                <div class="popular-product-active owl-carousel">
+
+                    <% products.forEach(product=> { %>
+
+                        <div class="product-wrapper">
+                            <div class="product-img">
+                                <a href="/product/<%= product?._id %>">
+                                    <img src="<%= product?.images[0]?.thumbnailUrl %>"
+                                        style="width: 300px; height: 400px;" class="img-fluid" alt="">
+                                </a>
+
+                                <div class="product-action">
+                                    <a class="animate-left" title="Wishlist" href="#">
+                                        <i class="pe-7s-like"></i>
+                                    </a>
+                                    <a class="animate-top" title="Add To Cart" href="#">
+                                        <i class="pe-7s-cart"></i>
+                                    </a>
+                                    <!-- <a class="animate-right" title="Quick View" data-bs-toggle="modal" data-bs-target="#exampleModal" href="#">
+                                <i class="pe-7s-look"></i>
+                            </a> -->
+                                <!-- </div>
+
+
+                            </div>
+                            <div class="funiture-product-content text-center">
+                                <h4><a href="#">
+                                        <%= product?.title %>
+                                    </a></h4>
+                                <h6>
+                                    <%= product?.category?.title %>
+                                </h6>>
+                            </div>
+                        </div>
+                </div>
+                <% }) %>
+            </div>
+        </div>
+    </div> -->
+    <!-- product area end -->
+
+
+    <!-- discount area start -->
+    <!-- <div class="discount-area pt-70 pb-120">
+    <div class="container">
+        <div class="row">
+            <div class="ms-auto col-lg-7">
+                <div class="discount-img pl-70">
+                    <img src="shop/assets/img/banner/28.jpg" alt="">
+                </div>
+            </div>
+            <div class="col-lg-5">
+                <div class="discount-details-wrapper">
+                    <h5>Verified quality</h5>
+                    <p>Lorem Ipsum is simply dummy text of the printing and typesetting industry.</p>
+                    <h2>Summer Discount <br>Up to 30%</h2>
+                    <p class="discount-peragraph">It is a long established fact that a reader will be distracted by the readable content of a page when looking at its layout.</p>
+                    <a class="discount-btn btn-hover" href="product-details.html">Buy Now</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div> -->
+    <!-- discount area end -->
+
+
+
+    <!-- premium area start -->
+    <div class="premium-banner-area mt-5">
+        <div class="container">
+            <div class="discount-wrapper">
+                <img src="shop/assets/img/banner/29.jpg" alt="">
+                <div class="discount-content">
+                    <h2>Premium Home <br>Decorator</h2>
+                    <a href="#">Learn More</a>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- premium area end -->
+
+
+
+   
+
+
+
+
+
+
+
+
+
+
+    <div class="shop-product-content tab-content  mt-5" style="display: flex;">
+        <div id="grid-sidebar1" class="tab-pane fade active show">
+            <div class="row">
+                <%- include('../partials/flash_msg') %>
+                <% products.forEach(product=> { %>
+                    <div class="col-lg-6 col-md-6 col-xl-3">
+                        <div class="product-wrapper mb-30">
+                            <div class="product-img">
+                                <a href="/product/<%= product._id %>">
+
+                                    <img src="<%= product?.images[0]?.thumbnailUrl %>"
+                                        alt="<%= product.title %>" width="200px"
+                                        height="310px" />
+                                </a>
+
+
+                                <div class="product-action">
+
+                                    <a class="animate-left" title="Wishlist" href="#">
+                                        <i class="pe-7s-like"></i>
+                                    </a>
+
+                                    <% if (product.quantity) { %>
+                                        <a class="animate-top" title="Add To Cart"  onclick="addToCart(`<%= product._id %>`)" >
+                                            <i class="pe-7s-cart"></i>
+                                        </a>
+                                        <% } %>
+
+
+                                    <!-- <a class="animate-right" title="Quick View"
+                                        data-bs-toggle="modal" data-bs-target="#exampleModal"
+                                        href="#">
+                                        <i class="pe-7s-look"></i>
+                                    </a> -->
+
+
+
+                                </div>
+                            </div>
+
+
+
+                            <div class="product-content">
+                                <div class="d-flex justify-content-between">
+                                    <medium class="card-title font-weight-bold"
+                                        style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap">
+                                        <%= product.title %>
+                                            <h6 class="small">
+                                                <!-- Category:<%=product?.Category?.title %> -->
+                                                <%= product.description %>
+                                            </h6>
+                                    </medium>
+                                </div>
+
+                                <div class="d-flex justify-content-between">
+                                    <span class="text-decoration-line-through text-secondary">₹
+                                        <%= product.productPrice %>
+                                    </span>
+                                    <span class="card-text h4">₹ <%= product.salePrice %></span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <% }) %>
+            </div>
+        </div>
+
+        
+
+    </div>
+    
+
+    <div class="view-all-product text-center">
+        <a href="/shops">View All Product</a>
+    </div>
+
+
+    <!-- product area end -->
+
+
+    <!-- testimonials area start -->
+    <div class="testimonials-area pt-120 pb-115">
+        <div class="container">
+            <div class="testimonials-active owl-carousel">
+                <div class="single-testimonial-2 text-center">
+                    <img src="shop/assets/img/team/1.png" alt="">
+                    <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+                        sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis
+                        nostrud exercitation.</p>
+                    <img src="shop/assets/img/team/2.png" alt="">
+                    <h4>tayeb rayed</h4>
+                    <span>uiux Designer</span>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- testimonials area end -->
+
+
+
+    <!-- services area start -->
+    <div class="services-area wrapper-padding-4 gray-bg pt-120 pb-80">
+        <div class="container-fluid">
+            <div class="services-wrapper">
+                <div class="single-services mb-40">
+                    <div class="services-img">
+                        <img src="shop/assets/img/icon-img/26.png" alt="">
+                    </div>
+                    <div class="services-content">
+                        <h4>Free Shippig</h4>
+                        <p>Contrary to popular belief, Lorem Ipsum is random text. </p>
+                    </div>
+                </div>
+                <div class="single-services mb-40">
+                    <div class="services-img">
+                        <img src="shop/assets/img/icon-img/27.png" alt="">
+                    </div>
+                    <div class="services-content">
+                        <h4>24/7 Support</h4>
+                        <p>Contrary to popular belief, Lorem Ipsum is random text. </p>
+                    </div>
+                </div>
+                <div class="single-services mb-40">
+                    <div class="services-img">
+                        <img src="shop/assets/img/icon-img/28.png" alt="">
+                    </div>
+                    <div class="services-content">
+                        <h4>Secure Payments</h4>
+                        <p>Contrary to popular belief, Lorem Ipsum is random text. </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- services area end -->
+    <%- include('../partials/footer') %>
+
+
+    <script>
+        function addToCart(id) {
+            const productId = id;
+            const url = `/cart/add/${productId}`;
+            const cartCount = document.getElementById("cartCount");
+            const cartMessage = document.getElementById("cart-message");
+
+            fetch(url, {
+                method: "GET",
+            })
+                .then((response) => {
+                    if (response.ok) {
+                        return response.json(); // Assuming server sends JSON
+                    } else {
+                        console.error("Failed");
+                    }
+                })
+                .then((data) => {
+                    if (data) {
+                        console.log(data["message"]);
+
+                        // Check if 'count' and 'message' properties exist in data
+                        if (data.count && data.message) {
+                            cartCount.innerText = data.count;
+                            cartMessage.innerText = data.message;
+
+                            cartMessage.className = `position-fixed bg-${data.status} text-white p-2 rounded`;
+                            cartMessage.style.display = "block";
+
+                            setTimeout(function () {
+                                cartMessage.style.display = "none";
+                            }, 3000);
+                        } else {
+                            console.error("Unexpected data format");
+                        }
+                    }
+                })
+                .catch((error) => {
+                    console.error("An error occurred:", error);
+                });
+        }
+
+    </script>

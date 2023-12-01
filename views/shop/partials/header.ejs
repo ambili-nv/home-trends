@@ -1,0 +1,83 @@
+
+<style>
+.ti-shopping-cart,
+.ti-user {
+  text-shadow:  0 0 1px black; /* Adjust the shadow values as needed */
+}
+</style>
+
+
+<header>
+    <div class="header-top-furniture wrapper-padding-2 res-header-sm">
+        <div class="container-fluid">
+            <div class="header-bottom-wrapper row align-items-center justify-content-between">
+                <div class="col-md-8">
+                    <div class="menu-style-2 furniture-menu menu-hover">
+                        <nav>
+                            <ul class="horizontal-menu">
+                                <li><a href="/home">home</a></li>
+                                <li><a href="/shops">shop</a></li>
+                                <li><a href="/about_us">About Us</a></li>
+                                <li><a href="/contact">contact</a></li>
+                                <li><i class="ti-search"></i></li>
+                            </ul>
+                        </nav>
+                    </div>
+                </div>
+                <div class="col-md-4 furniture-login text-end">
+                    <ul class="d-flex align-items-center justify-content-end">
+
+                        <% if (user) { %>
+                            <li><a href="/wishlist"><i class="ti-heart"></i>wishlist</a></li>
+                            <li><a href="/logout">Logout</a></li>
+                        <% } else { %>
+                            <li><a href="/login">login</a></li>
+                            <li><a href="/register">Register</a></li>
+                        <% } %>
+                        
+
+                        <!-- Add your cart, profile, and wishlist icons here -->
+                        <li>   
+                             <% if(user){ %>
+
+                            <div class="header-cart-2">
+                                <a class="icon-cart" href="/cart">
+                                    <i class="ti-shopping-cart"></i>
+                                    <span id="cartCount" class="handicraft-count"><%=cartCount %></span>
+                                </a>
+                            </div>
+        
+                        <% } %>
+                    </li>
+
+                    <li>   
+                        <% if(user){ %>
+
+                       <div class="header-cart-2">
+                           <a class="icon-user" href="/userprofile">
+                               <i class="ti-user"></i>
+                               
+                           </a>
+                       </div>
+   
+                   <% } %>
+               </li>
+                       
+                        <!-- <li><a href="/userprofile"><i class="ti-user"></i></a></li> -->
+                        
+                        
+                      
+                        
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="header-bottom-furniture wrapper-padding-2 border-top-3">
+        <div class="container-fluid"></div>
+    </div>
+</header>
+
+
+
+

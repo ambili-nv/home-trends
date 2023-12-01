@@ -1,0 +1,257 @@
+ <section class="content-main" style="margin-left: 250px;">
+    <div class="row">
+        <div class="col-6">
+            <div class="content-header">
+                <h2 class="content-title">Edit  Product</h2>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-lg-12">
+            <div class="card mb-4">
+                <div class="card-body">
+                    <form action="/admin/editproduct/<%= product._id %>?_method=PUT" method="post" id="editproductform">
+                     <div class="row">
+                        <div class="col-md-3">
+                            <h6>1. General info</h6>
+                        </div>
+                        <div class="col-md-9">
+                            <div class="mb-4">
+                                <label class="form-label">Product Name</label>
+                                <input type="text" placeholder="Type here" class="form-control" name="title" id="productName" value="<%= product.title %>" required>
+                                <p class="text-danger" id="nameError"></p>
+                            </div>
+                            <div class="mb-4">
+                                <label class="form-label">Category</label>
+                                <select class="form-select" name="category" id="category" required>
+                                    <option selected value="<%= product?.category?._id %>">
+                                        <%= product?.category?.title %>
+                                      </option>
+                                      <% categories.forEach(category => { %> <% if (category.title !==
+                                      product?.category?.title) { %>
+                                      <option value="<%= category._id %>"><%= category.title %></option>
+                                      <% } %> <% }) %>
+                                </select>
+                            </div>
+                            <div class="mb-4">
+                                <label class="form-label">Description</label>
+                                <textarea placeholder="Type here" class="form-control" rows="4" id="description" name="description">
+                                    <%= product.description %>
+                                </textarea>
+                                <p class="text-danger" id="descriptionError"></p>
+                            </div>
+                        </div> 
+                    </div> 
+                    <hr class="mb-4 mt-0">
+                    <div class="row">
+                        <div class="col-md-3">
+                            <h6>2. Pricing</h6>
+                        </div>
+                        <div class="col-md-9">
+                            <div class="mb-4">
+                                <label class="form-label">Product Price</label>
+                                <input type="number" placeholder="Enter Product Price" class="form-control" name="productPrice" id="productPrice"  value="<%= product.productPrice %>" required>
+                                <p class="text-danger" id="productpriceError"></p>
+                            </div>
+                            <div class="mb-4">
+                                <label class="form-label">Sales Price</label>
+                                <input type="number" placeholder="Enter Sale Price" class="form-control" name="salePrice" id="salePrice" value="<%= product.salePrice %>" required>
+                                <p class="text-danger" id="salespriceError"></p>
+                            </div>
+                        </div> 
+                    </div> 
+
+
+                    <hr class="mb-4 mt-0">
+                    <div class="row">
+                        <div class="col-md-3">
+                            <h6>3. Quantity</h6>
+                        </div>
+                        <div class="col-md-9">
+                            <div class="mb-4">
+                                <label class="form-label">Quantity</label>
+                                <input type="number" placeholder="Enter Quantity" class="form-control" name="quantity" id="quantity" value="<%= product.quantity %>" required>
+                                <p class="text-danger" id="quantityError"></p>
+                            </div>
+                        </div> 
+                    </div> 
+                    <div class="mb-4 mt-0"> 
+                        <div>
+                            <button type="submit" class="btn btn-primary mt-2" id="submit">Save Changes</button>
+                            <p class="text-danger" id="formErrorMessage"></p>
+                        </div>
+                    </div>
+                 </form> 
+
+
+                 <hr class="mb-4 mt-0">
+                 <div class="row">
+                     <div class="col-md-3">
+                         <h6>4. Media</h6>
+                     </div>
+                     <div class="col-md-9">
+                         <div class="mb-4">
+                             <label class="form-label">Media</label>
+
+
+                             <% product.images.forEach((element, index) => { %>
+                                <form
+                                  action="/admin/product/editImage/<%= product.images[index]._id %>/?_method=PUT"
+                                  method="post"
+                                  enctype="multipart/form-data"
+                                >
+                                  <div
+                                    class="mb-3 d-flex align-items-center justify-content-between"
+                                  >
+                                    <img
+                                      src="<%= product.images[index].thumbnailUrl %>"
+                                      alt="Image"
+                                      id="previewImage<%= index %>"
+                                      class="img-thumbnail mr-3"
+                                      style="max-width: 150px"
+                                    />
+                                    <div class="d-flex flex-column">
+                                      <input
+                                        type="file"
+                                        class="form-control"
+                                        id="image<%= index %>"
+                                        accept="image/*"
+                                        style="display: none"
+                                        name="images"
+                                      />
+                                      <button
+                                      type="button"
+                                      class="btn btn-sm btn-primary mb-2 update-image-button"
+                                      data-index="<%= index %>"
+                                    >
+                                      <i class="fas fa-upload"></i> Select Image
+                                    </button>
+                                    <button
+                                      type="submit"
+                                      class="btn btn-sm btn-success"
+                                      id="submitImage<%= index %>"
+                                      disabled
+                                    >
+                                      <i class="fas fa-edit"></i> Update Image
+                                    </button>
+
+                                    
+
+
+                                    
+                                    </div>
+                                  </div>
+                                </form>
+                                <% }) %>
+                         </div>
+                     </div> 
+                 </div> 
+          </div>
+        </div>
+      </div>
+</section>  
+
+
+
+
+<script>
+    const updateImageButtons = document.querySelectorAll(".update-image-button");
+    function handleFileInputChange(index) {
+      const fileInput = document.getElementById("image" + index);
+      const previewImage = document.getElementById("previewImage" + index);
+      const submitButton = document.getElementById("submitImage" + index);
+      fileInput.addEventListener("change", (event) => {
+        if (fileInput.files && fileInput.files[0]) {
+          const reader = new FileReader();
+          reader.onload = function (e) {
+            previewImage.src = e.target.result;
+          };
+          reader.readAsDataURL(fileInput.files[0]);
+          // Enable the "Update Image" button when a file is selected
+          submitButton.removeAttribute("disabled");
+        } else {
+          // Disable the "Update Image" button if no file is selected
+          submitButton.setAttribute("disabled", "disabled");
+        }
+      });
+      // Trigger the hidden file input
+      fileInput.click();
+    }
+    // Add event listeners to all update image buttons
+    updateImageButtons.forEach((button, index) => {
+      button.addEventListener("click", (event) => {
+        handleFileInputChange(index);
+      });
+    });
+  </script>
+
+
+
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const editProductForm = document.getElementById("editproductform");
+        const submitButton = document.getElementById("submit");
+        const nameInput = document.getElementById("productName");
+        const nameError = document.getElementById("nameError");
+        const productPriceInput = document.getElementById("productPrice");
+        const productPriceError = document.getElementById("productpriceError");
+        const salePriceInput = document.getElementById("salePrice");
+        const salePriceError = document.getElementById("salespriceError");
+        const quantityInput = document.getElementById("quantity");
+        const quantityError = document.getElementById("quantityError");
+
+        function validateForm() {
+            const nameValue = nameInput.value.trim();
+            const productPriceValue = parseFloat(productPriceInput.value);
+            const salePriceValue = parseFloat(salePriceInput.value);
+            const quantityValue = parseInt(quantityInput.value);
+
+            if (nameValue === "") {
+                nameError.textContent = "Product name is required";
+            } else {
+                nameError.textContent = "";
+            }
+
+            if (isNaN(productPriceValue) || productPriceValue <= 0) {
+                productPriceError.textContent = "Enter a valid product price";
+            } else {
+                productPriceError.textContent = "";
+            }
+
+            if (isNaN(salePriceValue) || salePriceValue <= 0) {
+                salePriceError.textContent = "Enter a valid sale price";
+            } else {
+                salePriceError.textContent = "";
+            }
+
+            if (isNaN(quantityValue) || quantityValue < 0) {
+                quantityError.textContent = "Enter a valid quantity";
+            } else {
+                quantityError.textContent = "";
+            }
+
+            const errors = [nameError.textContent, productPriceError.textContent, salePriceError.textContent, quantityError.textContent];
+            const hasError = errors.some((error) => error !== "");
+            submitButton.disabled = hasError;
+        }
+
+        function handleFormSubmit(event) {
+            validateForm();
+
+            if (submitButton.disabled) {
+                event.preventDefault();
+            }
+        }
+
+        nameInput.addEventListener("blur", validateForm);
+        productPriceInput.addEventListener("input", validateForm);
+        salePriceInput.addEventListener("input", validateForm);
+        quantityInput.addEventListener("input", validateForm);
+
+        editProductForm.addEventListener("submit", handleFormSubmit);
+
+        validateForm();
+    });
+</script>
+

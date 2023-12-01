@@ -1,0 +1,264 @@
+<section class="content-main" style="margin-left: 250px;">
+    <div class="row">
+        <div class="col-6">
+            <div class="content-header">
+                <h2 class="content-title">Add New Product</h2>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-lg-12">
+            <div class="card mb-4">
+                <div class="card-body">
+
+
+
+                    <form action="/admin/add" method="post" id="addproductform" enctype="multipart/form-data">
+                        <div class="row">
+                            <div class="col-md-3">
+                                <h6>1. General info</h6>
+                            </div>
+                            <div class="col-md-9">
+                                <div class="mb-4">
+                                    <label class="form-label">Product Name</label>
+                                    <input type="text" placeholder="Type here" class="form-control" name="title"
+                                        id="productName" required>
+                                    <p class="text-danger" id="nameError"></p>
+                                </div>
+                                <div class="mb-4">
+                                    <label class="form-label">Description</label>
+                                    <textarea placeholder="Type here" class="form-control" rows="4" name="description"
+                                        id="description" required></textarea>
+                                    <p class="text-danger" id="discriptionError"></p>
+                                </div>
+                                <div class="mb-4">
+                                    <label class="form-label">Category</label>
+                                    <select class="form-control" name="category" id="category" required>
+                                        <option value=""> Select Category </option>
+                                        <% categories.forEach(category=> { %>
+                                            <option value="<%= category._id %>">
+                                                <%= category.title %>
+                                            </option>
+                                            <% }) %>
+                                    </select>
+                                    <p class="text-danger" id="categoryError"></p>
+                                </div>
+                            </div>
+                        </div>
+                        <hr class="mb-4 mt-0">
+                        <div class="row">
+                            <div class="col-md-3">
+                                <h6>2. Pricing</h6>
+                            </div>
+                            <div class="col-md-9">
+                                <div class="mb-4">
+                                    <label class="form-label">Product Price</label>
+                                    <input type="text" placeholder="$00.0" class="form-control" name="productPrice"
+                                        id="productPrice" required>
+                                    <p class="text-danger" id="productpriceError"></p>
+                                </div>
+                                <div class="mb-4">
+                                    <label class="form-label">Sales Price</label>
+                                    <input type="text" placeholder="$00.0" class="form-control" name="salePrice"
+                                        id="salesPrice" required>
+                                    <p class="text-danger" id="salespriceError"></p>
+                                </div>
+                            </div>
+                        </div>
+                        <hr class="mb-4 mt-0">
+
+                        <div class="row">
+                            <div class="col-md-3">
+                                <h6>3. Quantity</h6>
+                            </div>
+                            <div class="col-md-9">
+                                <div class="mb-4">
+                                    <label class="form-label">Quantity</label>
+                                    <input type="text" placeholder="$00.0" class="form-control" name="quantity"
+                                        id="quantity" required>
+                                    <p class="text-danger" id="quantityError"></p>
+                                </div>
+                            </div>
+                        </div>
+                        <hr class="mb-4 mt-0">
+                        <div class="row">
+                            <div class="col-md-3">
+                                <h6>4. Media</h6>
+                            </div>
+                            <div class="col-md-9">
+                                <div class="mb-4">
+                                    <label class="form-label">Images</label>
+                                    <input class="form-control" type="file" name="images" id="image" multiple required>
+                                    <p class="text-danger" id="imageError"></p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="" mb-4 mt-0"">
+                            <div>
+                                <button type="submit" class="btn btn-primary mt-2" id="submit">Upload Product</button>
+                                <p class="text-danger" id="formErrorMessage"></p>
+                            </div>
+                        </div>
+                        <%- include('../partials/flash-message.ejs') %>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    </div>
+</section>
+
+
+
+<script>
+
+    document.addEventListener("DOMContentLoaded", function () {
+        const registrationForm = document.getElementById("addproductform");
+        const nameInput = document.querySelector('input[name="title"]');
+        const descriptionInput = document.querySelector('textarea[name="description"]');
+        const productpriceInput = document.querySelector('input[name="productPrice"]');
+        const salespriceInput = document.querySelector('input[name="salePrice"]');
+        const quantityInput = document.querySelector('input[name="quantity"]');
+
+
+
+        const registerButton = document.getElementById("submit");
+        const nameError = document.getElementById("nameError");
+        const descriptionError = document.getElementById("discriptionError");
+        const productpriceError = document.getElementById("productpriceError");
+        const salespriceError = document.getElementById("salespriceError");
+        const quantityError = document.getElementById("quantityError");
+        const formErrorMessage = document.getElementById("formErrorMessage");
+
+
+
+        // const nameRegex = /^[a-zA-Z]+$/;
+        const nameRegex = /^[a-zA-Z]+( [a-zA-Z]+)*$/;
+
+
+        function validateName() {
+            const nameValue = nameInput.value.trim();
+            if (nameValue === "") {
+                nameError.textContent = "Product name is required";
+            } else if (!nameRegex.test(nameValue)) {
+                nameError.textContent = "Product name can only contain alphabets";
+            } else {
+                nameError.textContent = "";
+            }
+            validateForm();
+        }
+
+        function validateDescription() {
+            const descriptionValue = descriptionInput.value.trim();
+            if (descriptionValue === "") {
+                descriptionError.textContent = "Description is required";
+            } else if (!nameRegex.test(descriptionValue)) {
+                descriptionError.textContent = "Description can only contain alphabets";
+            } else {
+                descriptionError.textContent = "";
+            }
+            validateForm();
+        }
+
+        // Function to validate productprice
+        function validateproductprice() {
+
+            const productpriceValue = parseFloat(productpriceInput.value); // Parse the value as a float
+
+            if (isNaN(productpriceValue) || productpriceValue < 0) {
+                productpriceError.textContent =
+                    "Price must be a positive numeric value";
+            } else {
+                productpriceError.textContent = "";
+            }
+            validateForm();
+        }
+
+        // Add a blur event listener to the productpriceInput
+        productpriceInput.addEventListener("blur", validateproductprice);
+
+
+
+        // Function to validate salesprice
+        function validatesalesprice() {
+            const salespriceValue = parseFloat(salespriceInput.value); // Parse the value as a float
+
+            if (isNaN(salespriceValue) || salespriceValue < 0) {
+                salespriceError.textContent =
+                    "Price must be a positive numeric value";
+            } else {
+                salespriceError.textContent = "";
+            }
+            validateForm();
+        }
+
+        // Add a blur event listener to the productpriceInput
+        salespriceInput.addEventListener("blur", validatesalesprice);
+
+
+
+        // Function to validate quantity
+        function validatequantity() {
+            const quantityValue = parseFloat(quantityInput.value); // Parse the value as a float
+
+            if (isNaN(quantityValue) || quantityValue < 0) {
+                quantityError.textContent = "Quantity must be a positive numeric value";
+            } else {
+                quantityError.textContent = "";
+            }
+            validateForm();
+        }
+
+        // Add a blur event listener to the quantityInput
+        quantityInput.addEventListener("blur", validatequantity);
+
+
+
+        function validateForm() {
+            const errors = [
+                nameError.textContent,
+                descriptionError.textContent,
+                productpriceError.textContent,
+                salespriceError.textContent,
+                quantityError.textContent,
+            ];
+            const hasErrors = errors.some((error) => error !== "");
+            registerButton.disabled = hasErrors;
+        }
+
+        // Attach event listeners for input fields
+        nameInput.addEventListener("blur", validateName);
+        descriptionInput.addEventListener("blur", validateDescription);
+        // Add event listeners for other fields...
+
+        function handleSubmit(event) {
+            event.preventDefault();
+            // Validate all fields again before submitting
+            validateName();
+            validateDescription();
+            // Validate other fields...
+
+            const xhr = new XMLHttpRequest();
+            xhr.open("POST", "/admin/add", true);
+            xhr.onreadystatechange = function () {
+                if (xhr.readyState === 4) {
+                    if (xhr.status === 200) {
+                        window.location.href = '/admin/productlist';
+                    } else {
+                        formErrorMessage.textContent = 'Error submitting the form.';
+                    }
+                }
+            };
+
+            const formData = new FormData(registrationForm);
+            xhr.send(formData);
+        }
+
+        registerButton.addEventListener("click", handleSubmit);
+
+        // Initially disable the button until the form is valid
+        validateForm();
+    });
+
+
+</script>

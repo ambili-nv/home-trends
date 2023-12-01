@@ -1,0 +1,35 @@
+
+<%- include('../partials/header') %>
+
+<style>
+    .image{
+        width: 150px;
+        height: 150px;
+    }
+</style>
+
+<div class="container mt-5">
+    <h1> Orders</h1>
+    <div class="row mt-4">
+        <div class="col-md-12">
+            <% if (orders && orders.length){ %>
+                <% orders.forEach(order => { %>
+                    <% order.orderItems.forEach(orderItem => { %>
+                        <div class="card shadow mb-3">
+                            <img src="<%= orderItem.product.images[0].thumbnailUrl %>" class="image" alt="Product Image">
+                            <div class="card-body">
+                                <h5 class="card-title"> Product: <%= orderItem.product.title %></h5>
+                                <p class="card-text"> Price: <%= orderItem.product.salePrice %> </p>
+                                <p class="card-text"> Quantity: <%= orderItem.quantity %></p>
+                                <p class="card-text"> Status: <%= orderItem.status %></p>
+                                <a href="/orders/<%= orderItem._id %>" class="btn btn-info btn-sm">View Details</a>
+                            </div>
+                        </div>
+                    <% }) %>
+                <% }) %>
+            <% } else { %>
+                <li class="list-group-item">No Orders</li>
+            <% } %>
+        </div>
+    </div>
+</div>

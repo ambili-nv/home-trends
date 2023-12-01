@@ -1,0 +1,190 @@
+<%- include('../partials/header') %>
+
+<div class="product-details ptb-100 pb-90">
+    <div class="container">
+      <%- include('../partials/flash_msg.ejs') %>
+        <div class="row">
+            <div class="col-md-12 col-lg-7 col-12">
+                <div class="product-details-img-content">
+                    <div class="product-details-tab mr-35 product-details-tab2">
+                        <div
+                        class="product-details-small nav mr-10 product-details-2 overflow-hidden"
+                        style="max-height: 650px"
+                      >
+                        <% product.images.forEach(function(image, index) { %>
+                        <a
+                          class="<%= index === 0 ? 'active' : '' %> mb-10"
+                          href="#pro-details<%= index + 1 %>"
+                          data-bs-toggle="tab"
+                          role="tab"
+                          aria-selected="<%= index === 0 %>"
+                        >
+                          <img
+                            src="<%= image.thumbnailUrl %>"
+                            alt=""
+                            class="img-thumbnail"
+                            style="width: 100px; height: auto"
+                          />
+                        </a>
+                        <% }); %>
+                      </div>
+                        <div class="product-details-large tab-content">
+                            <% product.images.forEach(function(image, index) { %>
+
+                            <div
+                             class="tab-pane <%= index === 0 ? 'active show fade' : 'fade' %>" id="pro-details<%= index + 1 %>"role="tabpanel">
+
+                                <div class="easyzoom easyzoom--overlay ">
+                                    <a href="<%= image.imageUrl %>">
+                                        <img src="<%= image.imageUrl %>" 
+                                        class="img-fluid border border-dark"
+                                        style="width: 350px; height: 500px"
+                                        alt="">
+                                    </a>
+                                </div>
+                            </div>
+                            <% }); %>    
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+
+            <div class="col-md-12 col-lg-5 col-12">
+                <div class="product-details-content">
+                    <h3><%= product.title %></h3>
+                    <div class="rating-number">
+                        <div class="quick-view-rating">
+                            <i class="pe-7s-star red-star"></i>
+                            <i class="pe-7s-star red-star"></i>
+                            <i class="pe-7s-star"></i>
+                            <i class="pe-7s-star"></i>
+                            <i class="pe-7s-star"></i>
+                        </div>
+                        <div class="quick-view-number">
+                            <span>2 Ratting (S)</span>
+                        </div>
+                    </div>
+                    <div >
+                        <div class="">
+                          <span class="h3 fw-bold">₹ <%= product.salePrice %></span>
+                        </div>
+                        <div class="">
+                          <span class="text-muted text-decoration-line-through"
+                            >₹ <%= product.productPrice %></span
+                          >
+                        </div>
+                    <p><%= product.description %></p>
+                    <% if (product.quantity === 0) { %>
+                      <smal class="text-danger h4">Out Of Stock!</smal>
+                      <% } else if (product.quantity < 5) { %>
+                      <smal class="text-warning h5"
+                        >Hurry, Only <%= product.quantity %> more left!</smal
+                      >
+                      <% } %>
+            
+
+
+                    <div class="quickview-plus-minus">
+                        <div class="cart-plus-minus">
+                            <input type="text" value="02" name="qtybutton" class="cart-plus-minus-box">
+                        </div>
+
+
+
+                        <div class="quickview-btn-cart">
+                            <% if(product.quantity === 0){ %>
+                            <a class="btn-hover-black"onclick="alert('You will be notified')">Notify me</a>
+                            <% }else{ %>
+
+                                <a
+                                  class="btn-hover-black"
+                                  onclick="addToCart(`<%= product._id %>`)"
+                                  >add to cart</a
+                                >
+                                <% } %>
+                        </div>
+
+
+                        <div class="quickview-btn-wishlist">
+                            <a class="btn-hover" href="#"><i class="pe-7s-like"></i></a>
+                        </div>
+                    </div>
+
+
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="product-description-review-area pb-90 mt-5">
+    <div class="container">
+        <div class="product-description-review text-center">
+            <div class="description-review-title nav" role=tablist>
+                <a class="active" href="#pro-dec" data-bs-toggle="tab" role="tab" aria-selected="true">
+                    Description
+                </a>
+                <a href="#pro-review" data-bs-toggle="tab" role="tab" aria-selected="false">
+                    Reviews (0)
+                </a>
+            </div>
+            <div class="description-review-text tab-content">
+                <div class="tab-pane active show fade" id="pro-dec" role="tabpanel">
+                    <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in</p>
+                </div>
+                <div class="tab-pane fade" id="pro-review" role="tabpanel">
+                    <a href="#">Be the first to write your review!</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<script>
+  function addToCart(id) {
+    const productId = id;
+    const url = `/cart/add/${productId}`;
+    const cartMessage = document.getElementById("cart-message");
+
+    fetch(url, {
+      method: "GET",
+    })
+      .then((response) => {
+        if (response.ok) {
+          return response.json(); // Assuming server sends JSON
+        } else {
+          console.error("Failed");
+        }
+      })
+      .then((data) => {
+        if (data) {
+          console.log(data["message"]);
+
+          // Check if 'count' and 'message' properties exist in data
+          if (data.count && data.message) {
+            // cartCount.innerText = data.count;
+            cartMessage.innerHTML = data.message;
+
+            cartMessage.className = `position-fixed bg-${data.status} text-white p-2 rounded`;
+            cartMessage.style.display = "block";
+
+            setTimeout(function () {
+              cartMessage.style.display = "none";
+            }, 3000);
+          } else {
+            console.error("Unexpected data format");
+          }
+        }
+      })
+      .catch((error) => {
+        console.error("An error occurred:", error);
+      });
+  }
+</script>
+
+
+		
+
+<%- include('../partials/footer') %>

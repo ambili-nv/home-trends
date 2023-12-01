@@ -1,0 +1,63 @@
+<section class="content-main" style="margin-left: 250px;">
+    <div class="content-header">
+        <h2 class="content-title">Customers List</h2>
+    </div>
+    <div class="card mb-4">
+        <div class="card-body">
+            <%- include('../partials/flash-message.ejs') %>
+            <% if (customers.length) { %>
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th>S.No</th>
+                            <th>Customer Name</th>
+                            <th>Email</th>
+                            <th>Status</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <% customers.forEach((element, index)=> { %>
+
+                        <tr>
+                            <td>
+                                <%= index + 1 %>
+                            </td>
+                            <td>
+                                <%= element.name %>
+
+                            </td>
+
+                            <td><a href="/admin/customers/viewcustomers/<%= element._id.toString()%>">
+                                <%= element.email %>
+                            </a></td>
+
+                            <td>
+                            <% if (element.isBlocked) { %> Blocked <% } else { %> Active <% } %>
+                            </td>
+
+                            <td>
+                                <% if (element.isBlocked) { %>
+                                    <form method="post"
+                                        action="/admin/unblock/<%= element._id %>?_method=PUT">
+                                        <button type="submit" class="btn btn-success">Unblock</button>
+                                    </form>
+                                    <% } else { %>
+                                        <form method="post"
+                                            action="/admin/block/<%= element._id %>?_method=PUT">
+                                            <button type="submit" class="btn btn-danger">Block</button>
+                                        </form>
+                                 <% } %>
+                            </td>
+                        </tr>
+                        <% }) %>
+                    </tbody>
+                </table> 
+            </div>
+            <% } else { %>
+                No Customers              
+        <% } %>
+        </div> 
+    </div> 
+</section>

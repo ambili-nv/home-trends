@@ -1,0 +1,503 @@
+<%- include('../partials/header') %>
+    <style>
+        /* Custom styles for the layout */
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            padding-top: 50px;
+        }
+
+        .checkout-box {
+            border: 1px solid #e1e1e1;
+            padding: 20px;
+            margin-bottom: 20px;
+            background-color: #fff;
+            border-radius: 5px;
+        }
+
+        .checkout-box h3 {
+            margin-top: 0;
+            margin-bottom: 20px;
+            font-size: 24px;
+        }
+
+        .btn-success {
+            background-color: #28a745;
+            border-color: #28a745;
+        }
+
+        .btn-success:hover {
+            background-color: #218838;
+            border-color: #1e7e34;
+        }
+    </style>
+    </head>
+
+    <body>
+
+        <div class="checkout-area ptb-100">
+            <div class="container">
+                <div class="row mb-2">
+                    <div class="col-lg-12">
+                        <div class="card shadow">
+                            <div class="card-body">
+                                <div class="d-flex align-items-center">
+
+
+
+                                    <div class="container">
+
+                                        <form action="/place-order" method="post">
+                                            <!-- Shipping Address -->
+                                            <div class="row">
+                                                <div class="col-md-12">
+                                                    <div class="checkout-box">
+                                                        <h3>Shipping Address</h3>
+
+                                                        <div class="d-flex align-items-center">
+                                                            <h3>ADDRESS</h3>
+                                                        </div>
+
+
+
+                                                        <div class="different-address">
+                                                            <div id="" class="row">
+
+                                                                <% if (address && address.length) { %>
+                                                                    <% address.forEach((item, index)=> { %>
+                                                                        <div class="col-md-8 mb-3">
+                                                                            <div class="card shadow">
+                                                                                <div class="card-body">
+                                                                                    <div class="form-check">
+                                                                                        <input class="form-check-input"
+                                                                                            type="radio"
+                                                                                            name="addressId"
+                                                                                            id="address<%= index %>"
+                                                                                            value="<%=
+                                                                      item._id %>" required <%=index===0 ? "checked"
+                                                                                            : "" %> />
+                                                                                        <label class="form-check-label"
+                                                                                            for="address<%= index %>">
+                                                                                            <h5 class="card-title">
+                                                                                                <%= item.name %>
+                                                                                            </h5>
+                                                                                            <p class="card-text">
+                                                                                                <%= item.street %>, <%=
+                                                                                                        item.city %>,
+                                                                                                        <%= item.state
+                                                                                                            %>, <%=
+                                                                                                                item.pincode
+                                                                                                                %>
+                                                                                            </p>
+                                                                                            <p class="card-text">
+                                                                                                Mobile: +91 <%=
+                                                                                                    item.mobile %>
+                                                                                            </p>
+                                                                                        </label>
+                                                                                    </div>
+                                                                                </div>
+                                                                            </div>
+                                                                        </div>
+                                                                        <% }) %>
+                                                                            <% } else { %> No Address Found
+                                                                                <div>
+                                                                                    <a class="btn btn-dark btn-sm mb-2 mr-3"
+                                                                                        href="/add-address">Add
+                                                                                        Address</a>
+                                                                                </div>
+                                                                                <% } %>
+
+                                                            </div>
+
+                                                            <!-- <div>
+                                                                <button type="button"
+                                                                    class="btn btn-dark btn-sm mb-2 mr-3"
+                                                                    data-toggle="modal" data-target="#addressModal">
+                                                                    Add New Address
+                                                                </button>
+                                                            </div> -->
+
+
+                                                        </div>
+
+
+                                                    </div>
+                                                </div>
+                                            </div>
+
+
+
+
+                                            <!-- Order Details -->
+                                            <div class="row">
+                                                <div class="col-md-12">
+                                                    <div class="checkout-box">
+                                                        <h3>Order Details</h3>
+
+                                                        <input type="hidden" id="originalCartData"
+                                                            name="currentCartData"
+                                                            value="<%= JSON.stringify(cartData) %>" />
+
+                                                        <div>
+                                                            <table class="table table-striped">
+                                                                <!-- ... Rest of the table ... -->
+                                                                <tbody>
+                                                                    <% product.forEach(item=> { %>
+                                                                        <tr class="cart_item">
+                                                                            <td class="product-name">
+                                                                                <% if (item.product.title.length> 36) {
+                                                                                    %>
+                                                                                    <p>
+                                                                                        <%= item.product.title.substring(0,
+                                                                                            15) + '...' %><strong
+                                                                                                class="product-quantity">×
+                                                                                                <%= item.quantity %>
+                                                                                            </strong></pl>
+                                                                                            <% } else { %>
+                                                                                                <p>
+                                                                                                    <%= item.product.title
+                                                                                                        %><strong
+                                                                                                            class="product-quantity">
+                                                                                                            × <%=
+                                                                                                                item.quantity
+                                                                                                                %>
+                                                                                                        </strong>
+                                                                                                </p>
+                                                                                                <% } %>
+                                                                            </td>
+
+                                                                            <td class="product-total">
+                                                                                <span class="amount">₹ <%=
+                                                                                        item.product.salePrice *
+                                                                                        item.quantity?.toFixed(2) %>
+                                                                                </span>
+                                                                            </td>
+                                                                        </tr>
+                                                                        <% }) %>
+                                                                </tbody>
+                                                                <tfoot>
+                                                                    <tr class="cart-subtotal">
+                                                                        <th>Cart Subtotal</th>
+                                                                        <td>
+                                                                            <span class="amount">₹ <%=
+                                                                                    subtotal?.toFixed(2) %></span>
+                                                                        </td>
+                                                                    </tr>
+
+                                                                    <tr class="order-total">
+                                                                        <th>Order Total</th>
+                                                                        <td>
+                                                                            <strong><span class="amount" id="total">₹
+                                                                                    <%= total?.toFixed(2) %>
+                                                                                </span></strong>
+                                                                        </td>
+                                                                    </tr>
+                                                                </tfoot>
+                                                            </table>
+                                                        </div>
+
+
+
+
+
+
+                                                    </div>
+
+
+                                                    <div>
+                                                        <button type="button" class="btn btn-dark btn-sm mb-2 mr-3"
+                                                            data-toggle="modal" data-target="#addressModal">
+                                                            Add New Address
+                                                        </button>
+                                                    </div>
+
+                                                </div>
+                                            </div>
+
+
+                                            <div class="payment-method">
+                                                <div class="payment-accordion">
+                                                    <div class="payment-method">
+                                                        <label for="payment-method-select">Select Payment
+                                                            Method:</label>
+                                                    </div>
+                                                    <% if (address && address.length) { %>
+                                                        <div class="order-button-payment d-flex flex-column gap-2">
+                                                            <div>
+                                                                <button type="button" class="btn btn-dark"
+                                                                    id="cod-button">
+                                                                    Cash On Delivery
+                                                                </button>
+                                                            </div>
+                                                        </div>
+
+
+
+
+                                                        <% } else { %>
+                                                            <span class="text-danger">Please Add an Address</span>
+                                                            <% } %>
+                                                </div>
+                                            </div>
+                                        </form>
+                                    </div>
+                                </div>
+
+                            </div>
+
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        </div>
+
+
+
+        <script>
+
+            document.addEventListener("DOMContentLoaded", () => {
+                const form = document.querySelector("form");
+                const codBtn = document.getElementById("cod-button");
+                console.log(codBtn);
+                const addressRadios = document.querySelectorAll('input[name="addressId"]');
+
+                let selectedAddressId; // Initialize selectedAddressId
+
+                const firstRadio = document.querySelector(
+                    'input[name="addressId"]:checked'
+                );
+                if (firstRadio) {
+                    selectedAddressId = firstRadio.value;
+                }
+
+                addressRadios.forEach((radio) => {
+                    radio.addEventListener("change", (event) => {
+                        selectedAddressId = event.target.value;
+                    });
+                });
+
+                codBtn.addEventListener("click", handleCodButtonClick);
+
+                async function handleCodButtonClick(event) {
+                    event.preventDefault();
+                    if (await checkCartData()) {
+                        const data = {
+                            addressId: selectedAddressId,
+                            payment_method: "cash_on_delivery",
+                        };
+                        await placeOrder("/place-order", data);
+                    }
+                }
+
+                // Rest of your functions...
+                async function placeOrder(url, data) {
+                    try {
+                        console.log(url);
+                        console.log(data);
+
+                        const response = await fetch(url, {
+                            method: "POST",
+                            headers: {
+                                "Content-Type": "application/json",
+                            },
+                            body: JSON.stringify(data),
+                        });
+                        if (!response.ok) {
+                            throw new Error("Network response was not ok");
+                        }
+                        const responseData = await response.json();
+
+                        if (data.payment_method === "cash_on_delivery") {
+                            handleCodPayment(responseData);
+                        }
+                    } catch (error) {
+                        handleError(error);
+                    }
+                }
+
+                async function checkCartData() {
+                    try {
+                        const originalCartData = JSON.parse(
+                            document.getElementById("originalCartData").value
+                        );
+
+                        const response = await fetch("/get");
+
+
+                        if (!response.ok) {
+                            throw new Error("Network response was not ok");
+                        }
+
+                        const currentCartData = await response.json();
+
+                        if (
+                            currentCartData !== null &&
+                            compareJSONStrings(originalCartData, currentCartData)
+                        ) {
+                            showCartConfirmation();
+                            return false;
+                        }
+
+                        return true;
+                    } catch (error) {
+                        handleError(error);
+                    }
+                }
+
+                function compareJSONStrings(jsonString1, jsonString2) {
+                    return JSON.stringify(jsonString1) !== JSON.stringify(jsonString2);
+                }
+
+                function showCartConfirmation() {
+                    Swal.fire({
+                        title: "Cart Confirmation",
+                        text: "Your cart has changed. Do you want to reload the page?",
+                        icon: "info",
+                        showCancelButton: true,
+                        confirmButtonText: "Reload",
+                        cancelButtonText: "Close",
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            proceedToCheckout();
+                        }
+                    });
+                }
+
+                function proceedToCheckout() {
+                    window.location.reload();
+                }
+
+                function handleCodPayment(responseData) {
+                    window.location.href = `/order-placed/${responseData.orderId}`;
+                }
+
+                function handleError(error) {
+                    console.error("Error:", error);
+                }
+
+            });
+
+
+        </script>
+
+
+
+
+
+
+        <!-- Modal -->
+        <div class="modal fade" id="addressModal" tabindex="-1" role="dialog" aria-labelledby="addressModalLabel"
+            aria-hidden="true">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="addressModalLabel">Add New Address</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+
+                        <form action="/add-address" method="post" id="addAddressForm">
+                            <div class="form-group">
+                                <label for="name"><b>Name</b></label>
+                                <input type="text" class="form-control" id="name" name="name" required>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="street"><b>Street</b></label>
+                                <input type="text" class="form-control" id="street" name="street" required>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="street"><b>City</b></label>
+                                <input type="text" class="form-control" id="city" name="city" required>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="street"><b>State</b></label>
+                                <input type="text" class="form-control" id="state" name="state" required>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="street"><b>Pincode</b></label>
+                                <input type="text" class="form-control" id="pincode" name="pincode" required>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="street"><b>Landmark</b></label>
+                                <input type="text" class="form-control" id="landmark" name="landmark">
+                            </div>
+
+                            <div class="form-group">
+                                <label for="street"><b>Mobile Number</b></label>
+                                <input type="text" class="form-control" id="mobile" name="mobile" required>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="street"><b>Alternative Number</b></label>
+                                <input type="text" class="form-control" id="alternativenumber" name="alternativenumber"
+                                    required>
+                            </div>
+
+                            <button type="submit" class="btn btn-dark">Add Address</button>
+                        </form>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+
+
+
+        <script>
+            // Get a reference to the form
+            const addressForm = document.getElementById("addressForm");
+
+            addressForm.addEventListener("submit", (event) => {
+                event.preventDefault(); // Prevent the default form submission
+
+                const formData = new FormData(addressForm);
+
+                // Create an empty object to store the form data
+                const formDataObject = {};
+
+                // Iterate through the FormData and populate the object
+                formData.forEach((value, key) => {
+                    formDataObject[key] = value;
+                });
+
+                // Convert the object to a JSON string
+                const jsonData = JSON.stringify(formDataObject);
+
+                const fetchOptions = {
+                    method: "POST",
+                    body: jsonData, // Send the JSON data
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                };
+
+                fetch("/user/add-address", fetchOptions)
+                    .then((response) => {
+                        if (response.ok) {
+                            console.log("Address added successfully");
+                            return response.json();
+                        } else {
+                            console.error("Error adding address");
+                        }
+                    })
+                    .then((data) => {
+                        if (data.status === "ok") {
+                            window.location.reload();
+                        }
+                    })
+                    .catch((error) => {
+                        console.error("Network error:", error);
+                    });
+            });
+        </script>

@@ -1,0 +1,91 @@
+<section class="content-main" style="margin-left: 250px;">
+    <div class="row">
+        <div class="col-6">
+            <div class="content-header">
+                <h2 class="content-title">Add New Category</h2>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-lg-12">
+            <div class="card mb-4">
+                <div class="card-body">
+                    <form action="/admin/addcategory" method="post" id="addcategory">
+                    <div class="row">
+                        <div class="col-md-4">
+                            <h6>Name of Category</h6>
+                        </div>
+                        <div class="col-md-9">
+                            <div class="mb-4">
+                                <input type="text" placeholder="Type here" class="form-control" name="title" id="CategoryName">
+                                <p class="text-danger" id="nameError"></p>
+                            </div>
+                            </div> 
+                        </div>
+                    </div> 
+                    <hr class="mb-4 mt-0">
+                    <div class="col-md-9">
+                        <div class="mb-4 ml-5">
+                            <h6>Status</h6> <br>
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" value="true" name="isListed" checked id="list">
+                                <label class="form-check-label" for="list">List</label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" value="false" name="isListed" id="unlist" >
+                                <label class="form-check-label" for="unlist">Unlist</label>
+                            </div> 
+                         </div>
+                           
+                        </div>
+
+                       
+                    </div>
+                </div>
+            </div>    
+            
+            <div class="d-grid">
+                <button type="submit" class="btn btn-primary" id="submit" style="width: fit-content;">Add category</button>
+            </div>
+            <%- include('../partials/flash-message.ejs') %> 
+        </form>
+</section> 
+
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const addcategoryform = document.getElementById("addcategory");
+        const addcategoryButton = document.getElementById("submit");
+        const nameInput = document.getElementById("CategoryName");
+        const nameError = document.getElementById("nameError");
+
+        function validateName() {
+            const nameValue = nameInput.value.trim();
+            if (nameValue === "") {
+                nameError.textContent = "Category name is required";
+            } else if (/\d/.test(nameValue)) {
+                nameError.textContent = "Category name cannot contain numbers";
+            } else {
+                nameError.textContent = "";
+            }
+            validateForm();
+        }
+
+        function validateForm() {
+            const errors = [nameError.textContent];
+            const hasError = errors.some((error) => error !== "");
+            addcategoryButton.disabled = hasError;
+        }
+
+        nameInput.addEventListener("blur", validateName);
+
+        addcategoryform.addEventListener("submit", function (event) {
+            validateName();
+            if (addcategoryButton.disabled) {
+                event.preventDefault();
+            }
+        });
+
+        validateForm();
+    });
+</script>
