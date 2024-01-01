@@ -10,8 +10,8 @@
                             <table>
                                 <thead>
                                     <tr>
-                                        <th>remove</th>
-                                        <th>images</th>
+                                        <th>Remove</th>
+                                        <th>Images</th>
                                         <th>Product</th>
                                         <th>Price</th>
                                         <th>Quantity</th>
@@ -38,15 +38,16 @@
                                                             
 
 
-                                                <td class="product-name"><a href="/product/<%= product.product._id %>">
-                                                        <%= product.product.title %>
-                                                    </a>
-                                                    <% if (product.product.isDeleted) { %>
-                                                        <p class="text-danger">Currently Unavailable</p>
-                                                        <% } else if (product.product.quantity < product.quantity) { %>
-                                                            <p class="text-danger">Out of Stock</p>
-                                                            <% } %>
-                                                </td>
+                                                            <td class="product-name">
+                                                                <a href="/product/<%= product.product._id %>">
+                                                                    <%= product.product.title %>
+                                                                </a>
+                                                                <% if (product.product.isDeleted) { %>
+                                                                    <p class="text-danger">Currently Unavailable</p>
+                                                                <% } else if (product.product.quantity < product.quantity) { %>
+                                                                    <p class="text-danger">Out of Stock</p>
+                                                                <% } %>
+                                                            </td>
 
 
                                                 <td class="product-price-cart"><span class="amount">₹ <% const
@@ -57,31 +58,40 @@
 
                                                 <td class="text-center">
                                                     <div class="btn-group" role="group" aria-label="Quantity">
-                                                        <a href="javascript:void(0);"
+                                                        <a
+                                                            href="javascript:void(0);"
                                                             class="btn btn-danger h-auto minusBtn"
-                                                            data-product-id="<%= product.product._id %>">
+                                                            data-product-id="<%= product.product._id %>"
+                                                        >
                                                             <i class="ti ti-minus"></i>
                                                         </a>
-                                                        <span class="btn btn-light h-auto quantity"
-                                                            id="quantity_<%= product.product._id %>">
+                                                        <span
+                                                            class="btn btn-light h-auto quantity"
+                                                            id="quantity_<%= product.product._id %>"
+                                                        >
                                                             <%= product.quantity %>
                                                         </span>
-
-                                                        <% if (product.quantity>= product.product.quantity) { %>
-                                                            <a href="javascript:void(0);"
-                                                                class="btn btn-primary h-auto plusBtn"
-                                                                data-product-id="<%= product.product._id %>"
-                                                                style="pointer-events: none" id="plusBtnDisabled">
-                                                                <i class="ti ti-plus"></i>
-                                                            </a>
-                                                            <% } else { %>
-                                                                <a href="javascript:void(0);"
-                                                                    class="btn btn-primary h-auto plusBtn"
-                                                                    data-product-id="<%= product.product._id %>"
-                                                                    id="plusBtn">
-                                                                    <i class="ti ti-plus"></i>
-                                                                </a>
-                                                                <% } %>
+            
+                                                        <% if (product.quantity >= product.product.quantity) { %>
+                                                        <a
+                                                            href="javascript:void(0);"
+                                                            class="btn btn-primary h-auto plusBtn"
+                                                            data-product-id="<%= product.product._id %>"
+                                                            style="pointer-events: none"
+                                                            id="plusBtnDisabled"
+                                                        >
+                                                            <i class="ti ti-plus"></i>
+                                                        </a>
+                                                        <% } else { %>
+                                                        <a
+                                                            href="javascript:void(0);"
+                                                            class="btn btn-primary h-auto plusBtn"
+                                                            data-product-id="<%= product.product._id %>"
+                                                            id="plusBtn"
+                                                        >
+                                                            <i class="ti ti-plus"></i>
+                                                        </a>
+                                                        <% } %>
                                                     </div>
                                                 </td>
 
@@ -143,7 +153,8 @@
                                         </li>
                                     </ul>
                                     <!-- <a href="/checkout">Proceed to checkout</a> -->
-                                    <button class="button btn-dark">Proceed to checkout</button>
+                                    <p id="errMsg" class="text-danger"></p>
+                                    <button class="button btn-dark" id="checkoutButton">Proceed to checkout</button>
                                 </div>
                             </div>
                         </div>
@@ -199,6 +210,7 @@
         function updateQuantityDisplay(id, data) {
             const quantitySpan = document.getElementById(`quantity_${id}`);
             const totalProductPrice = document.getElementById(`totalProductPrice_${id}`);
+      
     
             // Update the quantity displayed in the <span> element
             if (quantitySpan) {
@@ -206,6 +218,7 @@
                 totalProductPrice.innerText = data.productTotal;
             }
         }
+
     
         function managePlusButton(data) {
             const plusBtnDisabled = document.getElementById("plusBtnDisabled");
@@ -244,6 +257,7 @@
                 .then((responseData) => {
                     if (responseData) {
                         data = responseData;
+                        location.reload();
     
                         if (data.quantity <= 0) {
                             location.reload();
@@ -266,6 +280,7 @@
                 });
         }
     
+    
         // Add event listeners to all plus and minus buttons
         const plusButtons = document.querySelectorAll(".plusBtn");
         const minusButtons = document.querySelectorAll(".minusBtn");
@@ -283,4 +298,21 @@
                 updateQuantity(productId, false);
             });
         });
+
+
+        document.addEventListener('DOMContentLoaded', function() {
+    const checkoutButton = document.getElementById('checkoutButton');
+    const outOfStockItems = document.querySelectorAll('.text-danger');
+    const err = document.querySelector('#errMsg');
+
+    outOfStockItems.forEach(item => {
+        if (item.textContent === 'Out of Stock' || item.textContent === 'Currently Unavailable') {
+            checkoutButton.disabled = true;
+            err.innerHTML="Remove the out of stock product";
+            checkoutButton.classList.add('disabled'); // Optionally apply a visual style
+        }
+    });
+});
+
+
     </script>

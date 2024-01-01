@@ -43,20 +43,57 @@
                             <div class="card-body">
                                 <div class="d-flex align-items-center">
 
-
-
                                     <div class="container">
 
-                                        <form action="/place-order" method="post">
+                                                                            <!-- Apply Coupon Section -->
+                                <div class="row">
+                                 <div class="col-md-12">
+                                  <div class="checkout-box">
+                                    <h4>Apply Coupon</h4>
+                                     <div class="coupon-form">
+                                       <div class="input-group mb-3">
+                                        <input type="text" class="form-control" placeholder="Enter coupon code"  id="coupon_code"
+                                          name="coupon_code"
+                                          oninput="this.value = this.value.replace(/[^A-Za-z0-9]/g, '').toUpperCase();"> 
+
+                                        </div>    
+                              <div>
+
+                                <h6 class="mt-3 text-success" id="couponError">
+                                    <%= couponmessages.message %>
+                                   </h6>
+
+                                <div class="input-group-append">
+                                    <button class="btn btn-dark" type="button"  id="couponBtn"
+                                    name="apply_coupon">Apply Coupon</button>
+                              </div>
+                          <div class="input-group-append mt-2">
+                              <button class="btn btn-dark" type="button"   id="removeCouponBtn"
+                              onclick="handleRemoveCouponBtnClick()">Remove Coupon</button>
+                          </div>
+                        </div>
+                        </div>
+
+                        
+
+                        
+                    
+                </div>
+               
+            </div>
+           
+          </div>
+
+             <form action="/place-order" method="post">
                                             <!-- Shipping Address -->
                                             <div class="row">
                                                 <div class="col-md-12">
-                                                    <div class="checkout-box">
+                                                    <div class="checkout-box mt-3">
                                                         <h3>Shipping Address</h3>
 
-                                                        <div class="d-flex align-items-center">
+                                                        <!-- <div class="d-flex align-items-center">
                                                             <h3>ADDRESS</h3>
-                                                        </div>
+                                                        </div> -->
 
 
 
@@ -109,13 +146,10 @@
 
                                                             </div>
 
-                                                            <!-- <div>
-                                                                <button type="button"
-                                                                    class="btn btn-dark btn-sm mb-2 mr-3"
-                                                                    data-toggle="modal" data-target="#addressModal">
-                                                                    Add New Address
-                                                                </button>
-                                                            </div> -->
+                                                            <div>
+                                                                <a class="btn btn-dark btn-sm mb-2 mr-3"
+                                                                    href="/add-address">Add New Address</a>
+                                                            </div>
 
 
                                                         </div>
@@ -133,6 +167,7 @@
                                                 <div class="col-md-12">
                                                     <div class="checkout-box">
                                                         <h3>Order Details</h3>
+                                                     
 
                                                         <input type="hidden" id="originalCartData"
                                                             name="currentCartData"
@@ -184,6 +219,13 @@
                                                                         </td>
                                                                     </tr>
 
+                                                                    <tr class="cart-discount">
+                                                                        <th>Discount</th>
+                                                                        <td>
+                                                                          ₹<span class="amount" id="discount"><%= discount %></span>
+                                                                        </td>
+                                                                      </tr>
+
                                                                     <tr class="order-total">
                                                                         <th>Order Total</th>
                                                                         <td>
@@ -204,12 +246,6 @@
                                                     </div>
 
 
-                                                    <div>
-                                                        <button type="button" class="btn btn-dark btn-sm mb-2 mr-3"
-                                                            data-toggle="modal" data-target="#addressModal">
-                                                            Add New Address
-                                                        </button>
-                                                    </div>
 
                                                 </div>
                                             </div>
@@ -218,16 +254,27 @@
                                             <div class="payment-method">
                                                 <div class="payment-accordion">
                                                     <div class="payment-method">
+                                                        <h6 class="text-danger" id="errMsg"></h6>
                                                         <label for="payment-method-select">Select Payment
                                                             Method:</label>
                                                     </div>
                                                     <% if (address && address.length) { %>
                                                         <div class="order-button-payment d-flex flex-column gap-2">
                                                             <div>
-                                                                <button type="button" class="btn btn-dark"
-                                                                    id="cod-button">
+                                                                <button type="button" 
+                                                                class="btn btn-primary"
+                                                                id="cod-button">
                                                                     Cash On Delivery
                                                                 </button>
+                                                            </div>
+                                                            <div>
+                                                                <button
+                                                                class="btn btn-primary "
+                                                                type="button"
+                                                                id="rzp-button"
+                                                                value="submit">
+                                                                Pay with Razorypay
+                                                              </button>
                                                             </div>
                                                         </div>
 
@@ -255,15 +302,23 @@
 
 
 
+        <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+
         <script>
+
+           let selectedAddressId = null;
+        //    const wallet = document.getElementById("wallet");
+           const couponBtn = document.getElementById("couponBtn");
 
             document.addEventListener("DOMContentLoaded", () => {
                 const form = document.querySelector("form");
                 const codBtn = document.getElementById("cod-button");
-                console.log(codBtn);
+                const rzpBtn = document.getElementById("rzp-button");
                 const addressRadios = document.querySelectorAll('input[name="addressId"]');
+                
+              
 
-                let selectedAddressId; // Initialize selectedAddressId
+                // let selectedAddressId; // Initialize selectedAddressId
 
                 const firstRadio = document.querySelector(
                     'input[name="addressId"]:checked'
@@ -279,24 +334,48 @@
                 });
 
                 codBtn.addEventListener("click", handleCodButtonClick);
+                rzpBtn.addEventListener("click", handleRzpButtonClick);
+                couponBtn.addEventListener("click", handleCouponBtnClick);
+
+
 
                 async function handleCodButtonClick(event) {
+                    const code = document.getElementById("coupon_code").value;
                     event.preventDefault();
                     if (await checkCartData()) {
                         const data = {
                             addressId: selectedAddressId,
                             payment_method: "cash_on_delivery",
+                            code:code,
+                           
+                         
                         };
                         await placeOrder("/place-order", data);
                     }
                 }
 
+
+                async function handleRzpButtonClick() {
+                    const code = document.getElementById("coupon_code").value;
+                    
+                    if (await checkCartData()) {
+                        const data = {
+
+                            addressId: selectedAddressId,
+                            payment_method: "online_payment",
+                            code: code,
+                        
+
+                };
+                await placeOrder("/place-order", data);
+    }
+  }
+
+
                 // Rest of your functions...
                 async function placeOrder(url, data) {
                     try {
-                        console.log(url);
-                        console.log(data);
-
+                        
                         const response = await fetch(url, {
                             method: "POST",
                             headers: {
@@ -308,10 +387,15 @@
                             throw new Error("Network response was not ok");
                         }
                         const responseData = await response.json();
-
-                        if (data.payment_method === "cash_on_delivery") {
-                            handleCodPayment(responseData);
+                        if(response.status===201){
+                            // alert("Some product is out of stock")
+                            document.querySelector('#errMsg').innerText="Some product is out of stock";
                         }
+                        else if (data.payment_method === "cash_on_delivery") {
+                            handleCodPayment(responseData);
+                        } else if (data.payment_method === "online_payment") {
+                            handleRzpPayment(responseData);
+                        }    
                     } catch (error) {
                         handleError(error);
                     }
@@ -346,158 +430,210 @@
                     }
                 }
 
+
+
+
+
+
                 function compareJSONStrings(jsonString1, jsonString2) {
                     return JSON.stringify(jsonString1) !== JSON.stringify(jsonString2);
-                }
-
-                function showCartConfirmation() {
-                    Swal.fire({
-                        title: "Cart Confirmation",
-                        text: "Your cart has changed. Do you want to reload the page?",
-                        icon: "info",
-                        showCancelButton: true,
-                        confirmButtonText: "Reload",
-                        cancelButtonText: "Close",
-                    }).then((result) => {
-                        if (result.isConfirmed) {
-                            proceedToCheckout();
-                        }
-                    });
                 }
 
                 function proceedToCheckout() {
                     window.location.reload();
                 }
 
+
+
                 function handleCodPayment(responseData) {
-                    window.location.href = `/order-placed/${responseData.orderId}`;
+                    window.location.href = `/order-placed/${responseData.orderId}?code=${responseData.code}`;
+
                 }
 
-                function handleError(error) {
-                    console.error("Error:", error);
-                }
 
-            });
+                function handleRzpPayment(responseData) {
+                    const options = {
+                    key: "rzp_test_lurPZkW4S4BPhc",
+                    amount: responseData.order.total * 100,
+                    currency: "INR",
+                    name: "home_trends",
+                    description: "Test Transaction",
+                    order_id: responseData.order.id,
+                    handler: function (response) {
+                    handleSuccessPayment(response, responseData.orderId);
+                },
+                    prefill: {
+                    name: responseData.user.name,
+                    email: responseData.user.email,
+                },
+                   notes: {
+                   address: "Razorpay Corporate Office",
+                },
+                   theme: {
+                   color: "#000000", 
+                },
+                  modal: {
+                   ondismiss: function () {
+                    handlePaymentFailure(responseData.orderId);
+                },
+            },
+        };
+        
 
+    const rzp1 = new Razorpay(options);
 
-        </script>
+    rzp1.on("payment.failed", function (response) {
+      handlePaymentFailure(responseData.orderId);
+    });
 
-
-
-
-
-
-        <!-- Modal -->
-        <div class="modal fade" id="addressModal" tabindex="-1" role="dialog" aria-labelledby="addressModalLabel"
-            aria-hidden="true">
-            <div class="modal-dialog" role="document">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title" id="addressModalLabel">Add New Address</h5>
-                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                            <span aria-hidden="true">&times;</span>
-                        </button>
-                    </div>
-                    <div class="modal-body">
-
-                        <form action="/add-address" method="post" id="addAddressForm">
-                            <div class="form-group">
-                                <label for="name"><b>Name</b></label>
-                                <input type="text" class="form-control" id="name" name="name" required>
-                            </div>
-
-                            <div class="form-group">
-                                <label for="street"><b>Street</b></label>
-                                <input type="text" class="form-control" id="street" name="street" required>
-                            </div>
-
-                            <div class="form-group">
-                                <label for="street"><b>City</b></label>
-                                <input type="text" class="form-control" id="city" name="city" required>
-                            </div>
-
-                            <div class="form-group">
-                                <label for="street"><b>State</b></label>
-                                <input type="text" class="form-control" id="state" name="state" required>
-                            </div>
-
-                            <div class="form-group">
-                                <label for="street"><b>Pincode</b></label>
-                                <input type="text" class="form-control" id="pincode" name="pincode" required>
-                            </div>
-
-                            <div class="form-group">
-                                <label for="street"><b>Landmark</b></label>
-                                <input type="text" class="form-control" id="landmark" name="landmark">
-                            </div>
-
-                            <div class="form-group">
-                                <label for="street"><b>Mobile Number</b></label>
-                                <input type="text" class="form-control" id="mobile" name="mobile" required>
-                            </div>
-
-                            <div class="form-group">
-                                <label for="street"><b>Alternative Number</b></label>
-                                <input type="text" class="form-control" id="alternativenumber" name="alternativenumber"
-                                    required>
-                            </div>
-
-                            <button type="submit" class="btn btn-dark">Add Address</button>
-                        </form>
-
-                    </div>
-                </div>
-            </div>
-        </div>
+    rzp1.open();
+  }
 
 
+  function handleSuccessPayment(response, orderId) {
+    const postData = {
+      razorpay_payment_id: response.razorpay_payment_id,
+      razorpay_order_id: response.razorpay_order_id,
+      razorpay_signature: response.razorpay_signature,
+      orderId: orderId,
+    };
+
+    fetch(`/verify-payment`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(postData),
+    })
+      .then((response) => {
+        if (response.ok) {
+          return response.json();
+        } else {
+          throw new Error("Error fetching data");
+        }
+      })
+      .then((data) => {
+        window.location.href = `/order-placed/${data.orderId}`;
+      })
+      .catch((error) => {
+        handleError(error);
+      });
+  }
+
+
+  async function handlePaymentFailure(orderId) {
+    try {
+      const cancelOrderUrl = `/orders/${orderId}`;
+      const requestOptions = {
+        method: "PUT",
+      };
+      const response = await fetch(cancelOrderUrl, requestOptions);
+
+      if (response.ok) {
+        console.log("Order cancellation request succeeded.");
+        return response.json();
+      } else {
+        console.error("Order cancellation request failed.");
+      }
+    } catch (error) {
+      handleError(error);
+    }
+  }
+
+
+     function handleError(error) {
+         console.error("Error:", error);
+          }
+     });
 
 
 
-        <script>
-            // Get a reference to the form
-            const addressForm = document.getElementById("addressForm");
 
-            addressForm.addEventListener("submit", (event) => {
-                event.preventDefault(); // Prevent the default form submission
+    function handlePaymentChange() {
+    const totalAmount = document.getElementById("total");
+    const codBtn = document.getElementById("cod-button");
+    const rzpBtn = document.getElementById("rzp-button");
+    const code = document.getElementById("coupon_code");
 
-                const formData = new FormData(addressForm);
 
-                // Create an empty object to store the form data
-                const formDataObject = {};
+    fetch("/update", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        totalAmount.innerText = data.total.toFixed(2);
+        if (data.total === 0) {
+          rzpBtn.style.display = "none";
+        } else {
+          rzpBtn.style.display = "grid";
+        }
+      })
+      .catch((error) => {
+        console.error("Error Updating Checkout Page:", error);
+      });
+  }
 
-                // Iterate through the FormData and populate the object
-                formData.forEach((value, key) => {
-                    formDataObject[key] = value;
-                });
 
-                // Convert the object to a JSON string
-                const jsonData = JSON.stringify(formDataObject);
+    function handleCouponBtnClick(data) {
+    const couponCode = document.getElementById("coupon_code");
+    const couponError = document.getElementById("couponError");
+    const total = document.getElementById("total");
+    const discount = document.getElementById("discount");
+    const rzpBtn = document.getElementById("rzp-button");
+    const codBtn = document.getElementById("cod-button");
 
-                const fetchOptions = {
-                    method: "POST",
-                    body: jsonData, // Send the JSON data
-                    headers: {
-                        "Content-Type": "application/json",
-                    },
-                };
+    // console.log(discount+">>>>>>>>>>>>");
 
-                fetch("/user/add-address", fetchOptions)
-                    .then((response) => {
-                        if (response.ok) {
-                            console.log("Address added successfully");
-                            return response.json();
-                        } else {
-                            console.error("Error adding address");
-                        }
-                    })
-                    .then((data) => {
-                        if (data.status === "ok") {
-                            window.location.reload();
-                        }
-                    })
-                    .catch((error) => {
-                        console.error("Network error:", error);
-                    });
-            });
-        </script>
+    fetch("/coupon", {
+      method: "POST",
+      body: JSON.stringify({ code: couponCode.value }),
+      headers: {
+        "Content-Type": "application/json",
+      },
+    })
+      .then((response) => {
+        if (response.ok) {
+          return response.json();
+        }
+      })
+      .then((data) => {
+        // console.log(data +":::::");
+        if (data.status === "danger") {
+          couponError.classList.remove("text-success");
+          couponError.classList.add("text-danger");
+          couponError.textContent = data.messages;
+          discount.textContent = 0;
+          rzpBtn.classList.add("disabled");
+          rzpBtn.style.textDecoration = "line-through";
+          codBtn.classList.add("disabled");
+          codBtn.style.textDecoration = "line-through";
+        } else if (data.status === "success") {
+          couponError.textContent =
+            data.messages + " " + data.coupon.description;
+          couponError.classList.remove("text-danger");
+          couponError.classList.add("text-success");
+          total.textContent = data.total;
+          discount.textContent = data.discount;
+        }
+      })
+      .catch((error) => {
+        console.error("Fetch error:", error);
+      });
+  }
+
+  function handleRemoveCouponBtnClick() {
+    window.location.reload();
+  }
+
+
+</script>
+
+
+
+
+
+
+      

@@ -1,9 +1,9 @@
 
 <style>
-.ti-shopping-cart,
-.ti-user {
-  text-shadow:  0 0 1px black; /* Adjust the shadow values as needed */
+.header-top-furniture.wrapper-padding-2.res-header-sm {
+    height: 100px; /* Set the desired height */
 }
+
 </style>
 
 
@@ -19,7 +19,22 @@
                                 <li><a href="/shops">shop</a></li>
                                 <li><a href="/about_us">About Us</a></li>
                                 <li><a href="/contact">contact</a></li>
-                                <li><i class="ti-search"></i></li>
+                               
+                                <li>
+                                    <% if(user){%>
+                                        <a href="#">Account</a>
+                                        <ul class="single-dropdown">
+                                            <li><a class="text-bg-dark-light" href="/userprofile">Profile</a></li> 
+                                            <li><a class="text-bg-dark-light" href="/address">Address</a></li> 
+                                             <li><a class="text-bg-dark-light" href="/orders">Orders</a></li>
+                                             <li><a class="text-bg-dark-light" href="/wallet">Wallet</a></li>
+                                             <li><a class="text-bg-dark-light" href="/wishlist">wishlist</a></li>
+                                             <li><a class="text-bg-dark-light" href="/logout">Logout</a></li> 
+                                            </ul>
+                                   <% }  %>
+    
+                                </li>
+    
                             </ul>
                         </nav>
                     </div>
@@ -27,10 +42,10 @@
                 <div class="col-md-4 furniture-login text-end">
                     <ul class="d-flex align-items-center justify-content-end">
 
-                        <% if (user) { %>
-                            <li><a href="/wishlist"><i class="ti-heart"></i>wishlist</a></li>
-                            <li><a href="/logout">Logout</a></li>
-                        <% } else { %>
+                  
+
+                        
+                        <% if (!user) { %>
                             <li><a href="/login">login</a></li>
                             <li><a href="/register">Register</a></li>
                         <% } %>
@@ -50,18 +65,6 @@
                         <% } %>
                     </li>
 
-                    <li>   
-                        <% if(user){ %>
-
-                       <div class="header-cart-2">
-                           <a class="icon-user" href="/userprofile">
-                               <i class="ti-user"></i>
-                               
-                           </a>
-                       </div>
-   
-                   <% } %>
-               </li>
                        
                         <!-- <li><a href="/userprofile"><i class="ti-user"></i></a></li> -->
                         

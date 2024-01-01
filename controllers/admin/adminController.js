@@ -28,12 +28,12 @@ exports.homepage = asynchandler(async (req, res) => {
     })
     try {
         if (admin) {
-            res.redirect("/admin/dashboard",{ title: "Dashboard",orders });
+            res.render("admin/pages/dashboard",{ title: "Dashboard",orders });
         } else {
             res.redirect("/admin/login");
         }
 
-      
+    
 
     } catch (error) {
         throw new Error(error);
@@ -51,7 +51,7 @@ exports.dashboard = asynchandler(async(req,res)=>{
         }
     })
     try {
-        res.render('./admin/pages/dashboard',{ title: "Dashboard",orders })
+        res.render('admin/pages/dashboard',{ title: "Dashboard",orders })
     } catch (error) {
         throw new Error(error);
     }
@@ -173,11 +173,15 @@ exports.editcategory = asynchandler(async (req, res) => {
     // console.log(id);
     validateMongoDbId(id);
     try {
-        const {title, isListed} = req.body;
+        const {title, isListed, offer, offerDescription, startDate, endDate} = req.body;
 
         const editedCategory = await Category.findById(id);
         editedCategory.title = title;
         editedCategory.isListed = isListed;
+        editedCategory.offer = offer;
+        editedCategory.offerDescription = offerDescription;
+        editedCategory.startDate = startDate;
+        editedCategory.endDate = endDate;
         editedCategory.save();
         req.flash("success", `Category ${editedCategory.title} updated`);
         res.redirect("/admin/categories");
@@ -209,8 +213,16 @@ exports.productlist = asynchandler(async(req,res)=>{
     const products = await Products.find()
     .populate("category")
     .populate("images");
+
+    const itemsperpage = 5;
+        const currentpage = parseInt(req.query.page) || 1;
+        const startindex = (currentpage - 1) * itemsperpage;
+        const endindex = startindex + itemsperpage;
+        const totalpages = Math.ceil(products.length / 5);
+        const currentproduct = products.slice(startindex,endindex);
+
     try {
-        res.render("./admin/pages/productlist",{ title: "ProductList", messages, products,})
+        res.render("./admin/pages/productlist",{ title: "ProductList", messages, products,products:currentproduct,totalpages,currentpage})
     } catch (error) {
         throw new Error(error);
     }
@@ -498,28 +510,49 @@ exports.unblockCustomer = asynchandler(async (req, res) => {
 });
 
 
+//Offers
+//OfferPage GET Method
 
-
-
-// exports.orderlist = asynchandler(async(req,res)=>{
+// exports.offerPage = asynchandler(async(req,res)=>{
 //     try {
-//         res.render("./admin/pages/orderlist",{title: "Orders",})
+//         res.render("admin/pages/offers",{title:"Offer Page"})
 //     } catch (error) {
-//         throw new Error(error);
+//         throw new Error(error)
 //     }
 // })
 
 
+//category Offer
+//Method POST
 
-
-
-// exports.orderdetails = asynchandler(async(req,res)=>{
+// exports.categoryOffer = asynchandler(async(req,res)=>{
 //     try {
-//         res.render("./admin/pages/orderdetails",{title:"Order Details"})
-//     } catch (error) {
-//         throw new Error(error);
-//     }
+//         const { categoryId, offerPercentage } = req.body;
+//         console.log(categoryId,"categoryId");
+//         console.log(offerPercentage,"offerPercentage");
+//         const category = await Category.findById(categoryId);
+//         console.log(category,"category");
+//         if (category) {
+//           const products = await Products.find({ Category: categoryId });
+//           console.log(products,"products");
+//           for (const product of products) {   
+//             product.offerPercentage = offerPercentage;
+//             product.Price = product.salePrice - (product.salePrice * (product.offerPercentage / 100));
+//             console.log(product.Price,"product.Price");
+//             await product.save();
+//           }
+          
+    
+//           res.status(200).json({ success: true, message: 'Category offer applied successfully.' });
+//         } else {
+//           res.status(404).json({ success: false, message: 'Category not found.' });
+//         }
+//       } catch (error) {
+//         console.error(error);
+//         res.status(500).json({ success: false, message: 'An error occurred while applying the category offer.' });
+//       }
 // })
+
 
 
 

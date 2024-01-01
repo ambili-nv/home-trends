@@ -1,65 +1,101 @@
 <%- include('../partials/header') %>
-<div class="cart-main-area pt-95 pb-100 wishlist">
-    <div class="container">
-        <div class="row">
-            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
-                <h1 class="cart-heading">wishlist</h1>
-                <form action="#">
-                    <div class="table-content table-responsive">
-                        <table>
-                            <thead>
-                                <tr>
-                                    <th>remove</th>
-                                    <th>images</th>
-                                    <th>Product</th>
-                                    <th>Price</th>
-                                    <th>Quantity</th>
-                                    <th>Total</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr>
-                                    <td class="product-remove"><a href="#"><i class="pe-7s-close"></i></a></td>
-                                    <td class="product-thumbnail">
-                                        <a href="#"><img src="assets/img/cart/1.jpg" alt=""></a>
-                                    </td>
-                                    <td class="product-name"><a href="#">Wooden Furniture </a></td>
-                                    <td class="product-price-cart"><span class="amount">$165.00</span></td>
-                                    <td class="product-quantity">
-                                        <input value="1" min="1" type="number">
-                                    </td>
-                                    <td class="product-subtotal">$165.00</td>
-                                </tr>
-                                <tr>
-                                    <td class="product-remove"><a href="#"><i class="pe-7s-close"></i></a></td>
-                                    <td class="product-thumbnail">
-                                        <a href="#"><img src="assets/img/cart/2.jpg" alt=""></a>
-                                    </td>
-                                    <td class="product-name"><a href="#">Vestibulum dictum</a></td>
-                                    <td class="product-price-cart"><span class="amount">$150.00</span></td>
-                                    <td class="product-quantity">
-                                        <input value="1" min="1" type="number">
-                                    </td>
-                                    <td class="product-subtotal">$150.00</td>
-                                </tr>
-                                <tr>
-                                    <td class="product-remove"><a href="#"><i class="pe-7s-close"></i></a></td>
-                                    <td class="product-thumbnail">
-                                        <a href="#"><img src="assets/img/cart/3.jpg" alt=""></a>
-                                    </td>
-                                    <td class="product-name"><a href="#">Vestibulum dictum</a></td>
-                                    <td class="product-price-cart"><span class="amount">$150.00</span></td>
-                                    <td class="product-quantity">
-                                        <input value="1" min="1" type="number">
-                                    </td>
-                                    <td class="product-subtotal">$150.00</td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
-                </form>
-            </div>
-        </div>
+<style>
+    /* Additional style for smaller buttons */
+    .btn-sm {
+      padding: 0.25rem 0.5rem;
+      font-size: 0.875rem;
+    }
+
+    .center-image {
+  text-align: center; /* Center aligns the content */
+  line-height: 200px; /* Set to the desired fixed height */
+  height: 200px; /* Set to the desired fixed height */
+}
+  </style>
+
+  <div class="container pt-5">
+    <div class="row">
+      <div class="col-12 text-center">
+        <h1 class="display-4">Wishlist</h1>
+      </div>
     </div>
-</div>
-<%- include('../partials/footer') %>
+    <%- include('../partials/flash_msg') %>
+    <div class="row mt-4">
+      <% if (populatedWishlist.length) { %> <% populatedWishlist.forEach((product)=> { %>
+      <!-- Dummy wishlist item 1 -->
+      <div class="col-lg-3 col-md-4 col-sm-6 mb-4">
+        <div class="card shadow">
+          <a href="/product/<%= product._id %>">
+            <img class="card-img-top img-fluid center-image" src="<%= product.images[0].thumbnailUrl %>" alt="<%= product.title %>">
+          </a>
+          <div class="card-body">
+            <h5 class="card-title">
+              <% if (product.title.length > 15) { %> <%=
+                product.title.substring(0, 15) + "..." %> <% } else { %> <%=
+                  product.title %> <% } %>
+            </h5>
+
+            <p class="card-text">Price: ₹ <%= product.salePrice %></p>
+            <a href="/wishlist/remove/<%= product._id %>" class="btn btn-danger btn-sm">Remove</a>
+
+            <a  class="btn btn-primary btn-sm" 
+            class="btn btn-primary btn-sm "
+            onclick="addToCart(`<%= product._id %>`)"
+            >Add to cart
+             
+            </a>
+            
+          </div>
+        </div>
+      </div>
+      <% }) %> <% } else { %> No Items in wishlist <% } %>
+      <!-- Dummy wishlist item 2 -->
+      
+      <!-- More dummy wishlist items... -->
+    </div>
+  </div>
+  
+
+  <script>
+    function addToCart(id) {
+        const productId = id;
+        const url = `/cart/add/${productId}`;
+        const cartCount = document.getElementById("cartCount");
+        const cartMessage = document.getElementById("cart-message");
+  
+        fetch(url, {
+            method: "GET",
+        })
+            .then((response) => {
+                if (response.ok) {
+                    return response.json(); // Assuming server sends JSON
+                } else {
+                    console.error("Failed");
+                }
+            })
+            .then((data) => {
+                if (data) {
+                    console.log(data["message"]);
+  
+                    // Check if 'count' and 'message' properties exist in data
+                    if (data.count && data.message) {
+                        cartCount.innerText = data.count;
+                        cartMessage.innerText = data.message;
+  
+                        cartMessage.className = `position-fixed bg-${data.status} text-white p-2 rounded`;
+                        cartMessage.style.display = "block";
+  
+                        setTimeout(function () {
+                            cartMessage.style.display = "none";
+                        }, 3000);
+                    } else {
+                        console.error("Unexpected data format");
+                    }
+                }
+            })
+            .catch((error) => {
+                console.error("An error occurred:", error);
+            });
+    }
+  
+  </script>

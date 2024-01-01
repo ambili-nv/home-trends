@@ -8,25 +8,70 @@ const status = require("../../utils/status");
 //Orders page 
 //GET Method
 
+// exports.ordersListPage = asynchandler(async (req, res) => {
+//     const itemsperpage = 5;
+//     const currentpage = parseInt(req.query.page) || 1;
+//     const startindex = (currentpage - 1) * itemsperpage;
+//     const endindex = startindex + itemsperpage;
+//     const totalpages = Math.ceil(products.length / 5);
+//     const currentproduct = products.slice(startindex,endindex);
+
+//     try {
+//         const orders = await Order.find().populate({
+//             path:"orderItems",
+//             populate:{
+//                 path:"product",
+//                 populate:{
+//                     path:"images",
+//                 }
+//             }
+//         })
+
+//         .sort({orderedDate: -1});
+
+//         res.render("admin/pages/orders", { title: "Orders",orders });
+//     } catch (error) {
+//         throw new Error(error);
+//     }
+// });
+
+
 exports.ordersListPage = asynchandler(async (req, res) => {
+    const itemsPerPage = 25;
+    const currentpage = parseInt(req.query.page) || 1;
+    const startIndex = (currentpage - 1) * itemsPerPage;
+
     try {
-        const orders = await Order.find().populate({
-            path:"orderItems",
-            populate:{
-                path:"product",
-                populate:{
-                    path:"images",
-                }
-            }
-        })
+        const totalOrdersCount = await Order.countDocuments();
+        const totalpages = Math.ceil(totalOrdersCount / itemsPerPage);
 
-        .sort({orderedDate: -1});
+        const orders = await Order.find()
+            .populate({
+                path: "orderItems",
+                populate: {
+                    path: "product",
+                    populate: {
+                        path: "images",
+                    },
+                },
+                select: 'quantity product price status isPaid shippedDate deliveredDate payment_method', 
+            })
+            .sort({ orderedDate: -1 })
+            .skip(startIndex)
+            .limit(itemsPerPage);
 
-        res.render("admin/pages/orders", { title: "Orders",orders });
+        res.render("admin/pages/orders", {
+            title: "Orders",
+            orders,
+            currentpage,
+            totalpages, // Pass totalpages to the view
+        });
     } catch (error) {
         throw new Error(error);
     }
 });
+
+
 
 
 //Edit OrderPage
@@ -82,8 +127,17 @@ exports.updateOrderStatus = asynchandler(async(req,res)=>{
             }
            
             
+        } else if(order.status === status.status.returnPending){ 
+
+            order.status = status.status.returned;
+            await order.save()
+            const product = await Product.findById(order.product);
+            product.sold -= order.quantity;
+            product.quantity += order.quantity;
+            await product .save();
+
+            
         }
-        
         res.redirect("back");   
     } catch (error) {
         throw new Error(error)

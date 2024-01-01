@@ -67,28 +67,38 @@
                   />
                 </div>
                 <div class="form-group">
-                    <% if(item.status === "Pending" || item.status === "Shipped") { %>
-                  <label for="status">New Status:</label>
-                  <select name="status" class="form-control mb-3">
-                    <% if (item.status === "Pending") { %>
-                        <option value="Pending" <%= item.status === 'Pending' ? 'selected' : '' %>>Pending</option>
-                        <option value="Shipped" <%= item.status === 'Shipped' ? 'selected' : '' %>>Shipped</option>
-                        <option value="Delivered" <%= item.status === 'Delivered' ? 'selected' : '' %>>Delivered</option>
-                        <option value="Cancelled" <%= item.status === 'Cancelled' ? 'selected' : '' %>>Cancelled</option>
-                        <% } else if (item.status === "Shipped") { %>
-                            <option value="Shipped" <%= item.status === 'Shipped' ? 'selected' : '' %>>Shipped</option>
-                            <option value="Delivered" <%= item.status === 'Delivered' ? 'selected' : '' %>>Delivered</option>
-                            <option value="Cancelled" <%= item.status === 'Cancelled' ? 'selected' : '' %>>Cancelled</option>
-                            <% } %>
-                  </select>
-                  <button type="submit" class="btn btn-primary btn-block">Update Status</button>
-                  <% }else if(item.status === "Cancelled"){ %>
-                    <h5 class="text-danger mt-3 text-weight-bold"> Order cancellled</h5>
-                <% }else if(item.status === "Delivered"){ %>
-                    <h5 class="text-success mt-3 text-weight-bold"> Order Delivered</h5>
-                       <% } %>
+                  <% if(item.status === "Pending" || item.status === "Shipped") { %>
+                    <label for="status">New Status:</label>
+                    <select name="status" class="form-control mb-3">
+                      <% if (item.status === "Pending") { %>
+                          <option value="Pending" <%= item.status === 'Pending' ? 'selected' : '' %>>Pending</option>
+                          <option value="Shipped" <%= item.status === 'Shipped' ? 'selected' : '' %>>Shipped</option>
+                          <option value="Delivered" <%= item.status === 'Delivered' ? 'selected' : '' %>>Delivered</option>
+                          <option value="Cancelled" <%= item.status === 'Cancelled' ? 'selected' : '' %>>Cancelled</option>
+                      <% } else if (item.status === "Shipped") { %>
+                          <option value="Shipped" <%= item.status === 'Shipped' ? 'selected' : '' %>>Shipped</option>
+                          <option value="Delivered" <%= item.status === 'Delivered' ? 'selected' : '' %>>Delivered</option>
+                          <option value="Cancelled" <%= item.status === 'Cancelled' ? 'selected' : '' %>>Cancelled</option>
+                          <% } %>
+                        </select>
+                          <button type="submit" class="btn btn-primary mt-2">Update Status</button>
+                          <% }else if(item.status === "Cancelled"){ %>
+                              <h5 class="text-danger mt-3 text-weight-bold"> Order cancellled</h5>
+                          <% }else if(item.status === "Delivered"){ %>
+                              <h5 class="text-success mt-3 text-weight-bold"> Order Delivered</h5>
+                          <% } else if (item.status === "Returned") { %>
+                            <h5 class="text-warning mt-3 text-weight-bold"> Order Returned</h5>
+                          <% } %>
                 </div>
               </form>
+
+             <% if (item.status === "Return Requested") { %>
+                <div class="col-md-2 d-flex flex-column justify-content-center">
+                  <form action="/admin/order/update/<%= item._id %>?_method=PUT" method="post">
+                    <button id="confirmButton" class="btn btn-danger text-white mt-3" onclick="confirmReturn(this)">ConfirmReturn</button>
+                  </form>
+                </div>
+              <% } %>
             </div>
           </div>
         </div>
@@ -97,3 +107,15 @@
       <% }) %>
     </div>
   </div>
+
+
+
+
+
+  <script>
+    function confirmReturn(button) {
+      var returnText = document.getElementById("returnText");
+      button.style.display = "none";
+      returnText.style.display = "block";
+    }
+  </script>

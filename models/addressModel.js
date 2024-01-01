@@ -23,7 +23,7 @@ const addressSchema = new mongoose.Schema({
     },
     landmark: {
         type: String,
-        required: true,
+        
     },
     mobile: {
         type: String,

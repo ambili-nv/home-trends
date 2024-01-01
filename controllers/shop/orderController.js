@@ -1,6 +1,6 @@
 const asynchandler = require("express-async-handler");
 const orderhelper = require("../../helper/orderhelper");
-const status = require("../../utils/status");
+
 
 
 //Oder Page
@@ -65,6 +65,25 @@ exports.cancelSingleOrder = asynchandler(async(req,res)=>{
 
         if(result === "redirectBack"){
             res.redirect("back");
+        }else{
+            res.json(result);
+        }
+    } catch (error) {
+        throw new Error(error);
+    }
+});
+
+
+
+
+exports.returnOrder = asynchandler(async(req,res)=>{
+    try {
+        const returnOrderItemId = req.params.id;
+        const result = await orderhelper.returnOrder(returnOrderItemId);
+
+        if(result === "redirectBack"){
+            res.redirect("back");
+            // console.log("Order Returned");
         }else{
             res.json(result);
         }

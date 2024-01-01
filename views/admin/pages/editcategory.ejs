@@ -10,7 +10,8 @@
         <div class="col-lg-12">
             <div class="card mb-4">
                 <div class="card-body">
-                    <form action="/admin/edit/<%= category._id %>?_method=PUT" method="post" id="editcategory">
+                    <form action="/admin/category/edit/<%= category._id %>?_method=PUT" method="post" id="editcategory">
+
                         <div class="row">
                             <div class="col-md-4">
                                 <h6>Name of Category</h6>
@@ -21,6 +22,34 @@
                                         value="<%= category.title %>" id="CategoryName">
                                         <p class="text-danger" id="nameError"></p>
                                 </div>
+
+
+                                <div class="mb-4">
+                                    <label for="offer" class="form-label">Offer Percentage</label>
+                                    <input type="text" class="form-control" id="offer" name="offer" value="<%= category.offer %>"   placeholder="Enter offer percentage">
+                                    <p class="text-danger" id="valueError"></p>
+                                </div>
+
+                                <div class="mb-4">
+                                    <label for="startDate" class="form-label">Start Date</label>
+                                    <input type="date" class="form-control" id="startDate" name="startDate" value="<%= (category && category.startDate) ? category.startDate.toISOString().split('T')[0] : '' %>"  placeholder="Enter start date">
+                                    <p class="text-danger" id="startdateError"></p>
+                                </div>
+
+                                <div class="mb-4">
+                                    <label for="endDate" class="form-label">End Date</label>
+                                    <input type="date" class="form-control" id="endDate" name="endDate"  value="<%= (category && category.endDate) ? category.endDate.toISOString().split('T')[0] : '' %>"  placeholder="Enter end date">
+                                    <p class="text-danger" id="enddateError"></p>
+                                </div>
+
+                                <div class="mb-4">
+                                    <label for="offerDescription" class="form-label">Offer Description</label>
+                                    <textarea class="form-control" id="offerDescription" name="offerDescription" placeholder="Enter offer description"><%= category.offerDescription %></textarea>
+                                    <p class="text-danger" id="descriptionError"></p>
+                                </div>
+
+
+
                             </div>
                         </div>
                 </div>
@@ -56,39 +85,38 @@
 
 
 <script>
-    document.addEventListener("DOMContentLoaded", function () {
-        const editcategoryform = document.getElementById("editcategory");
-        const addcategoryButton = document.getElementById("submit");
-        const nameInput = document.getElementById("CategoryName");
-        const nameError = document.getElementById("nameError");
 
-        function validateName() {
-            const nameValue = nameInput.value.trim();
-            if (nameValue === "") {
-                nameError.textContent = "Category name is required";
-            } else if (/\d/.test(nameValue)) {
-                nameError.textContent = "Category name cannot contain numbers";
-            } else {
-                nameError.textContent = "";
-            }
-            validateForm();
+document.addEventListener("DOMContentLoaded", function () {
+    const submitForm = document.getElementById("editcategory");
+
+    submitForm.addEventListener("submit", function (e) {
+        const categoryName = document.getElementById("CategoryName").value.trim();
+        const offerPercentage = parseInt(document.getElementById("offer").value.trim());
+        const startDate = new Date(document.getElementById("startDate").value);
+        const endDate = new Date(document.getElementById("endDate").value);
+        const offerDescription = document.getElementById("offerDescription").value.trim();
+
+        const nameError = categoryName === "" || /^\s+$/.test(categoryName) || /\d/.test(categoryName);
+        const valueError = isNaN(offerPercentage) || offerPercentage < 0 || offerPercentage > 100;
+        const startDateError = isNaN(startDate.getTime()) || startDate <= new Date();
+        const endDateError = isNaN(endDate.getTime()) || endDate <= startDate || endDate <= new Date();
+        const descriptionError = offerDescription === "" || /^\s+$/.test(offerDescription);
+
+        // Display error messages
+        document.getElementById("nameError").textContent = nameError ? "Name should not be empty, contain only letters, and no spaces" : "";
+        document.getElementById("valueError").textContent = valueError ? "Offer percentage should be between 1 and 100" : "";
+        document.getElementById("startdateError").textContent = startDateError ? "Start date should be a future date" : "";
+        document.getElementById("enddateError").textContent = endDateError ? "End date should be a future date and greater than start date" : "";
+        document.getElementById("descriptionError").textContent = descriptionError ? "Offer description should not be empty" : "";
+
+        // Check for overall validity
+        const isValid = !(nameError || valueError || startDateError || endDateError || descriptionError);
+
+        if (!isValid) {
+            e.preventDefault(); // Prevent form submission if there are errors
+            document.getElementById("formError").textContent = "Please fill in all required fields correctly";
         }
-
-        function validateForm() {
-            const errors = [nameError.textContent];
-            const hasError = errors.some((error) => error !== "");
-            editcategoryButton.disabled = hasError;
-        }
-
-        nameInput.addEventListener("blur", validateName);
-
-        editcategoryform.addEventListener("submit", function (event) {
-            validateName();
-            if (editcategoryButton.disabled) {
-                event.preventDefault();
-            }
-        });
-
-        validateForm();
     });
+});
+
 </script>

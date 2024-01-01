@@ -1,10 +1,11 @@
 const express = require('express');
 const router = express.Router();
 const authController = require('../../controllers/shop/authController');
+// const 
 const {ensureLoggedIn, ensureLoggedOut } = require("connect-ensure-login");
 const { body } = require('express-validator');
 const passport = require('passport');
-
+const bcrypt = require('bcrypt')
 router.use((req, res, next) => {
     req.app.set("layout", "shop/layout");
     next()
@@ -18,6 +19,7 @@ router.get("/logout", ensureLoggedIn({redirectTo:"/login"}), authController.logo
 router.get("/verify-otp", authController.verifyOtppage);
 
 
+
 router.post("/verify-otp", authController.verifyOtp);
 router.post("/check-email",authController.checkemail);
 router.post("/resend-email", authController.resendEmail);
@@ -28,9 +30,7 @@ router.post('/login',passport.authenticate('local',{
 }));
 
 
-
-router.get("/reset-password/:token", authController.resetPasswordpage);
-router.put("/reset-password/:token", authController.resetPassword);
+router.get("/blocked/:id", authController.blockedUser);
 
 
 
@@ -42,7 +42,7 @@ router.post('/register',
     body('password')
   .trim()
   .isLength({ min: 8 })
-  .withMessage('Minimum 6 characters required')
+  .withMessage('Minimum 8 characters required')
   .matches(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]+$/)
   .withMessage('Password must contain at least 1 uppercase, 1 lowercase, 1 digit, and 1 special character'),
 
@@ -57,5 +57,8 @@ router.post('/register',
 authController.userRegister);
 
 
+
+
+router.put('/changepassword',authController.updatePassword);
 
 module.exports=router;

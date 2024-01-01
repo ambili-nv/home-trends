@@ -6,11 +6,14 @@ const Products = require("../../models/productModel");
 const category = require("../../models/categoryModel");
 const validateMongoDbId = require("../../utils/validateMongoDbId");
 const Address = require("../../models/addressModel")
+const sharp = require("sharp");
+const path = require('path');
+const Wallet = require('../../models/walletModel')
+const WalletTransaction = require('../../models/walletTransactionModel');
+
 
 exports.loadHome = asynchandler(async (req,res)=>{
-
-
-    try {
+ try {
         const queryOption = {isListed:true};
         const Category = req.query;   
         const messages = req.flash();
@@ -68,24 +71,31 @@ exports.loadProfile = asynchandler(async(req,res)=>{
 
 exports.editProfile = asynchandler(async(req,res)=>{
     const id = req.params.id;
-    console.log(id);
+    console.log("user id is"+id);
     validateMongoDbId(id);
     try{
         
         const{name,email} = req.body;
+        const file = req.file;
+        if(file){
+
+        
+        const avatharBuffer = await sharp(file.path)
+            .resize(200, 200)
+            .toBuffer();
+          const avatharUrl = path.join("/admin/uploads", file.filename);
+
           const user = await User.findByIdAndUpdate(
             id,
             {
               name,
+              image: avatharUrl,
               email,
             },);
 
-
-             
-
             req.flash("success","profile updated");
             res.redirect("/userprofile");
-        
+        }
     }catch(error){
         throw new Error(error);
     }
@@ -166,3 +176,49 @@ exports.editaddress = asynchandler(async (req, res) => {
         throw new Error(error);
     }
 });
+
+//Delete Address
+// DELETE Method
+exports.deleteAddress = asynchandler(async(req,res)=>{
+    try {
+        const id = req.params.id;
+        const userId = req.user._id;
+        validateMongoDbId(id);
+        await User.findByIdAndUpdate(userId, { $pull: { address: id } });
+        const address = await Address.findByIdAndDelete(id);
+        req.flash("warning", "address deleted");
+        res.redirect("/address");
+    } catch (error) {
+        throw new Error(error);
+    }
+})
+
+//Wallet Page 
+//GET Method
+
+exports.walletPage = asynchandler(async(req,res)=>{
+try {
+    const user = req.user._id;
+    console.log(user);
+  
+    let wallet = await Wallet.findOne({user:user});
+    if (!wallet)
+     {      
+        let newWallet = await Wallet.create({ user: user });
+        console.log('New wallet created:', newWallet);
+        wallet =newWallet
+
+      }
+    // console.log("wallet is"+newWallet);
+    console.log(wallet,"wallet:::::::::::::::::");
+    const walletId = wallet._id;
+    console.log("wallet id is" + walletId);
+    const walletTransaction = await WalletTransaction.find({wallet:walletId});
+    console.log(`wallet trasaction is ${walletTransaction}`);
+    res.render("shop/pages/wallet",{title:"wallet",page:"wallet",wallet,user,walletTransaction})
+} catch (error) {
+    throw new Error(error)
+}
+})
+
+

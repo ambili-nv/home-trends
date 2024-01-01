@@ -10,9 +10,11 @@ router.use((req, res, next) => {
     next()
 })
 
-router.get('/login', ensureLoggedOut({redirectTo:"/admin/dashboard"}), authController.loginpage);
-router.get("/logout", ensureLoggedIn({redirectTo:"/admin/login"}),authController.logout);
+// router.get('/login',  authController.loginpage);
+router.get("/login", ensureLoggedOut({redirectTo:"/admin/dashboard"}), authController.loginpage);
+// router.get("/logout", ensureLoggedIn({redirectTo:"/admin/login"}),authController.logout);
+router.get("/logout", ensureLoggedIn({redirectTo:"/admin/login"}), authController.logout);
 //post
 router.post("/login",passport.authenticate("local", { successReturnToOrRedirect: "/admin/dashboard",failureRedirect: "/admin/login",failureFlash: true,}));
-// router.post('/login', authController.adminLogin);
+
 module.exports=router;

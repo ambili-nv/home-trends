@@ -1,5 +1,5 @@
 const asynchanlder = require("express-async-handler");
-const category = require("../../models/categoryModel");
+const Category = require("../../models/categoryModel");
 const Products = require("../../models/productModel");
 const validateMongoDbId = require('../../utils/validateMongoDbId');
 
@@ -10,27 +10,54 @@ const validateMongoDbId = require('../../utils/validateMongoDbId');
 exports.shoppage = asynchanlder(async(req,res)=>{
     try {
         const queryOption = {isListed:true};
-        const Category = req.query;   
+        const { page, perPage ,search,sortBy ,category} = req.query;
         const messages = req.flash();
 
-
-        if (Category) {
-            queryOption.Category = Category;
+        if (search) {
+            queryOption.$or = [
+                { title: { $regex: new RegExp(search, "i") } }
+            ];
         }
 
-        const allProducts = await Products.find({}).populate("images").populate("category");
-        const products = allProducts;
+        if (category) {
+            queryOption.category = category;
+        }
 
-        const categories = await category.find({isListed:true});
+
+        const currentPage = parseInt(page) || 1;
+        const itemsPerPage = parseInt(perPage) || 8;
+        const allProducts = await Products.find(queryOption).populate("images").populate("category").exec();
+        const skip = (currentPage - 1) * itemsPerPage;
+        const products = allProducts.slice(skip, skip + itemsPerPage);
+
+        const sortOptions = {};
+        if (sortBy === "az") {
+            sortOptions.title = 1;
+        } else if (sortBy === "za") {
+            sortOptions.title = -1;
+        } else if (sortBy === "price-asc") {
+            sortOptions.salePrice = 1;
+        } else if (sortBy === "price-desc") {
+            sortOptions.salePrice = -1;
+        }
+
+        products.sort((a, b) => {
+            if (sortOptions.title) {
+                return a.title.localeCompare(b.title) * sortOptions.title;
+            } else if (sortOptions.salePrice) {
+                return (a.salePrice - b.salePrice) * sortOptions.salePrice;
+            }
+            return 0;
+        });
+
+        const categories = await Category.find({isListed:true});
         const totalProductsCount = allProducts.length;
-        console.log(totalProductsCount);
-        res.render("./shop/pages/shops",{title:"Shop Page",page:"shop", categories,messages,products,totalProductsCount,Category,user: req.user});
-
+       
+        res.render("shop/pages/shops",{title:"Shop Page",page:"shop", categories,messages,products, currentPage, totalProductsCount, itemsPerPage,sortBy,search,category});
     } catch (error) {
-        throw new Error(error); 
-     }
- });
-
+       throw new Error(error); 
+    }
+});
 
  //Single paroduct 
  //GET Method

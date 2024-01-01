@@ -18,7 +18,10 @@
             <p class="card-text"><%= item.alternativenumber %></p>
 
           <a href="/address/edit/<%= item._id %>" class="btn btn-sm btn-primary mr-2">Edit</a>
-          
+          <form action="/address/delete/<%= item._id %>/?_method=DELETE" method="post">
+            <button type="submit" class="btn btn-danger mt-3">Remove</button>
+        </form>
+
          
         </div>
 

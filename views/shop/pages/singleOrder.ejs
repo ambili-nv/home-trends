@@ -1,3 +1,4 @@
+<%- include('../partials/header') %>
 <style>
     .image{
         width: 150px;
@@ -18,14 +19,21 @@
               alt="Product Image"
             />
   
-            <p><strong>Order ID:</strong><%= order.orderId %></p>
+            <p><strong>Order ID:</strong><%= orders.orderId %></p>
             <p><strong>Product Name:</strong> <%= order.product.title %></p>
             <p>
-              <strong>Shipping Address:</strong> <%= order.shippingAddress %>, <%= order.street %>, <%= order.city %>, <%= order.state %>, <%= order.zip %>
+              <strong>Shipping Address:</strong><%= orders.street %>,<%= orders.city %>,<%= orders.state %>,<%= orders.pincode %>
             </p>
-            <p><strong>Price:</strong> ₹<%= order.price %></p>
+            <p><strong>Price:</strong> ₹<%= (order.price * order.quantity) %></p>
+
+            <% const discount = orders.totalPrice - order.price; %>
+            <% if (discount !== 0) { %>
+                <p><strong>Discount:</strong> <%= discount %> </p>
+            <% } %>
+            <p><strong>Total Amount:</strong> <%= orders.totalPrice %></p>
+            
             <p>
-              <strong>Ordered Date:</strong> <%= new Date(order.orderedDate).toUTCString() %>
+              <strong>Ordered Date:</strong> <%= new Date(orders.orderedDate).toUTCString() %>
             </p>
             <% if (order.status === "Shipped") { %>
               <p>
@@ -39,25 +47,43 @@
   
             <p><strong>Product Quantity:</strong> <%= order.quantity %></p>
             <p>
-              <strong>Order Status:</strong> <% if (order.status==='Pending' ) { %>
-                <span class="text-warning"> <%= order.status %> </span>
-              <% } else if (order.status==='Shipped' ) { %>
-                <span class="text-primary"> <%= order.status %> </span>
-              <% } else if (order.status==='Cancelled' || order.status==='Return Requested' ) { %>
-                <span class="text-danger"> <%= order.status %> </span>
-              <% } else if (order.status==='Delivered' ) { %>
-                <span class="text-success"> <%= order.status %> </span>
-              <% } %>
+              <strong>Order Status:</strong>
+            <% if (order.status==='Pending' ) { %>
+            <span class="text-warning"> <%= order.status %> </span>
+            <% } else if (order.status==='Shipped' ) { %>
+            <span class="text-primary"> <%= order.status %> </span>
+            <% } else if (order.status==='Cancelled' || order.status==='Return Requested' ) { %>
+            <span class="text-danger"> <%= order.status %> </span>
+            <% } else if (order.status==='Delivered' ) { %>
+            <span class="text-success"> <%= order.status %> </span>
+            <% } else if (order.status==='Returned' ) { %>
+            <span class="text-info"> <%= order.status %> </span>
+            <% } %>
             </p>
-            <% if (order.status !== "Cancelled" ) { %>
+
+            <% if (order.status === "Delivered") { %>
               <button
                 class="btn btn-danger h-auto"
                 data-toggle="modal"
-                data-target="#cancelOrderModal"
+                data-target="#returnOrderModal"
               >
-                Cancel Order
+                Return Order
               </button>
-            <% } %>
+
+              <% }else if(order.status === "Return Requested" || order.status ===
+          "Returned"){ %>
+          <p></p>
+          <% } else if(order.status !== "Cancelled" ) { %>
+          <button
+            class="btn btn-danger h-auto"
+            data-toggle="modal"
+            data-target="#cancelOrderModal"
+          >
+            Cancel Order
+          </button>
+          <% } %>
+
+
   
             <div class="modal fade" id="cancelOrderModal" tabindex="-1" role="dialog" aria-labelledby="cancelOrderModalLabel" aria-hidden="true">
               <div class="modal-dialog" role="document">
@@ -80,6 +106,47 @@
                 </div>
               </div>
             </div>
+
+
+            <div class="modal fade" id="returnOrderModal" tabindex="-1" role="dialog" aria-labelledby="returnOrderModalLabel" aria-hidden="true">
+              <div class="modal-dialog modal-dialog-centered" role="document">
+                <!-- <form action="/order/return/<%= order._id %>" method="POST"> -->
+                <div class="modal-content">
+                  <div class="modal-header ">
+                    <h5 class="modal-title" id="returnOrderModalLabel">Return Order</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                      <span aria-hidden="true">&times;</span>
+                    </button>
+                  </div>
+                  <div class="modal-body">
+                    <!-- <form> -->
+                      <div class="form-group">
+                        <label for="returnReason">Reason for returning:</label>
+                        <select class="form-control" id="reason" name="reason" required>
+                          <option value="wrongItem">Received Wrong Item</option>
+                          <option value="damaged">Damaged Item</option>
+                          <option value="notAsDescribed">Not as Described</option>
+                          <option value="changedMind">Changed Mind</option>
+                          <option value="qualityConcerns">Quality Concerns</option>
+                          <!-- Add more options as needed -->
+                        </select>
+                      </div>
+                    </div>
+                      <!-- Add more fields for other information if needed -->
+                      <div class="modal-footer">
+                        <form action="/orders/return/<%= order._id %>?_method=PUT" method="post">
+                          <button type="submit" class="btn btn-danger">Confirm</button>
+                        </form>
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                      </div>
+                    <!-- </form> -->
+                 
+                </div>
+              </div>
+            </div>
+
+
+
           </div>
         </div>
       </div>

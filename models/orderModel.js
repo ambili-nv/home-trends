@@ -56,6 +56,17 @@ const orderSchema = new mongoose.Schema({
     totalPrice:{
         type:Number,
     },
+    wallet:{
+        type:Number,
+        default:0
+    },
+
+    coupon:{
+        type:Object,
+    },
+    discount:{
+        type:Number,
+    },
  
 });
 

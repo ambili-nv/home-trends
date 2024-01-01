@@ -1,32 +1,30 @@
+<style>
+    /* Additional CSS for highlighting the active category */
+    .sidebar-categories .active {
+        /* Define styles to highlight the active category */
+        font-weight: bold;
+        color: black; /* Change the color as desired */
+    }
+</style>
+
 <%- include('../partials/header') %>
+
     <div class="shop-page-wrapper shop-page-padding ptb-100">
         <div class="container-fluid">
             <div class="row gy-5">
                 <div class="col-lg-3 order-2 order-lg-1">
                     <div class="shop-sidebar mr-50">
                         <div class="sidebar-widget mb-50">
-                            <%- include('../partials/flash_msg') %>
+                            
                             <h3 class="sidebar-title">Search Products</h3>
                             <div class="sidebar-search">
                                 <form action="/shops">
-                                    <input placeholder="Search Products..." type="text">
+                                    <input placeholder="Search Products..." type="text" id="search" name="search" value="<%= search %>">
                                     <button><i class="ti-search"></i></button>
                                 </form>
                             </div>
                         </div>
-                        <div class="sidebar-widget mb-40">
-                            <h3 class="sidebar-title">Filter by Price</h3>
-                            <div class="price_filter">
-                                <div id="slider-range"></div>
-                                <div class="price_slider_amount">
-                                    <div class="label-input">
-                                        <label>price : </label>
-                                        <input type="text" id="amount" name="price" placeholder="Add Your Price" />
-                                    </div>
-                                    <button type="button">Filter</button>
-                                </div>
-                            </div>
-                        </div>
+  
 
                         
 
@@ -34,56 +32,52 @@
                             <h3 class="sidebar-title">Categories</h3>
                             <div class="sidebar-categories">
                                 <ul>
-                                
-
-                                    <% categories.forEach(category=> { %> <% if (category.title
-                                            !==products?.category?.title) { %>
-                                            <li><a href="">
-                                                    <%= category.title %>
-                                                </a>
-                                            </li>
-
-                                            <% } %>
-                                                <% }) %>
-
-
+                                    <% categories.forEach(element => { %>
+                                        <li>
+                                            <a href="/shop?page=<%= currentPage - 1 %>&search=<%= search %>&category=<%= element._id %>"
+                                                class="<%= category === element._id.toString() ? 'active' : '' %>">
+                                                <%= element.title %>
+                                            </a>
+                                        </li>
+                                    <% }) %>
                                 </ul>
                             </div>
                         </div>
+                        
                     </div>
                 </div>
 
-
-
+               
+                
                 <div class="col-lg-9 order-1 order-lg-2">
                     <div class="shop-product-wrapper res-xl res-xl-btn">
                         <div class="shop-bar-area">
                             <div class="shop-bar pb-60">
                                 <div class="shop-found-selector">
-                                    <div class="shop-found">
-                                        <p><span>23</span> Product Found of <span>50</span></p>
-                                    </div>
                                     <div class="shop-selector">
                                         <label>Sort By : </label>
-                                        <select name="select">
-                                            <option value="">Default</option>
-                                            <option value="">A to Z</option>
-                                            <option value=""> Z to A</option>
-                                            <option value="">In stock</option>
-                                        </select>
+                                        <select name="sortBy" id="sortBySelect" data-current-page="<%= currentPage %>"
+                                            data-category="<%= category %>">
+                                            <option <%= sortBy === "default" ? "selected" : "" %> value="default">Default</option>
+                                            <option <%= sortBy === "az" ? "selected" : "" %> value="az">A to Z</option>
+                                            <option <%= sortBy === "za" ? "selected" : "" %> value="za">Z to A</option>
+                                            <option <%= sortBy === "price-asc" ? "selected" : "" %> value="priceasc">price:Low to High</option>
+                                            <option <%= sortBy === "price-desc" ? "selected" : "" %> value="pricedesc">price:High to Low</option>
+                                          </select>
                                     </div>
                                 </div>
 
-
+                                
 
                             </div>
+                            
 
-
+                            
 
                             <div class="shop-product-content tab-content">
                                 <div id="grid-sidebar1" class="tab-pane fade active show">
                                     <div class="row">
-
+                                        <%- include('../partials/flash_msg') %>
                                         <% products.forEach(product=> { %>
                                             <div class="col-lg-6 col-md-6 col-xl-3">
                                                 <div class="product-wrapper mb-30">
@@ -98,7 +92,11 @@
 
                                                         <div class="product-action">
 
-                                                            <a class="animate-left" title="Wishlist" href="#">
+                                                            <a  
+                                                            id="wishlistButton"
+                                                            class="animate-left"
+                                                            title="Wishlist"
+                                                            onclick="toggleWishlist('<%= product._id %>')">
                                                                 <i class="pe-7s-like"></i>
                                                             </a>
 
@@ -133,18 +131,30 @@
                                                                 style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap">
                                                                 <%= product.title %>
                                                                     <h6 class="small">
-                                                                        <!-- Category:<%=product?.Category?.title %> -->
-                                                                        <%= product.description %>
+                                                                        Category:<%=product.Category?.title %>
+                                                                        <!-- <%= product.description %> -->
                                                                     </h6>
                                                             </medium>
+                                                            <div>
+                                                                <% if (product.quantity ==0) { %>
+                                                                    <p class="text-danger">Out of Stock </p> 
+                                                              <%  } %>
+                                                            </div>
                                                         </div>
+                                                       
+
 
                                                         <div class="d-flex justify-content-between">
-                                                            <span class="text-decoration-line-through text-secondary">₹
-                                                                <%= product.productPrice %>
-                                                            </span>
+                                                            <% if (product.salePrice !== product.productPrice) { %>
+                                                                    <div class="">
+                                                                        <span class="text-decoration-line-through text-secondary">₹ <%= product.productPrice %></span>
+                                                                        <span class="text-success" ><%= product.category.offer %>% Off</span>
+                                                                    </div>
+                                                            <% } %>
                                                             <span class="card-text h4">₹ <%= product.salePrice %></span>
                                                         </div>
+
+
                                                     </div>
                                                 </div>
                                             </div>
@@ -154,12 +164,76 @@
 
 
 
+                                <div class="pagination-style mt-30 text-center">
+                                    <ul>
+                                      <% if (currentPage > 1) { %>
+                                      <li>
+                                        <a
+                                          href="/shop?page=<%= currentPage - 1 %>"
+                                        >
+                                          <i class="ti ti-arrow-left"></i>
+                                          <!-- Font Awesome icon for "Previous" -->
+                                        </a>
+                                      </li>
+                                      <% } %> <% for (let i = 1; i <= Math.ceil(totalProductsCount /
+                                      itemsPerPage); i++) { %>
+                                      <li class="<%= currentPage === i ? 'active' : '' %>">
+                                        <a
+                                          href="/shop?page=<%= i %>"
+                                          ><%= i %></a
+                                        >
+                                      </li>
+                                      <% } %> <% if (currentPage < Math.ceil(totalProductsCount /
+                                      itemsPerPage)) { %>
+                                      <li>
+                                        <a
+                                          href="/shop?page=<%= currentPage + 1 %>"
+                                        >
+                                          <i class="ti ti-arrow-right"></i>
+                                          <!-- Font Awesome icon for "Next" -->
+                                        </a>
+                                      </li>
+                                      <% } %>
+                                    </ul>
+                                  </div>
+
 
                             
                             </div>
                         </div>
                     </div>
                 </div>
+
+
+
+                <script>
+                    const sortBySelect = document.getElementById("sortBySelect");
+                    const currentPage = sortBySelect.getAttribute("data-current-page");
+                    const category = sortBySelect.getAttribute("data-category");
+                    const search = document.getElementById("search").value;
+                  
+                    sortBySelect.addEventListener("change", function () {
+                        const selectedValue = this.value;
+                  
+                        // Define a mapping of sort options to URLs
+                        const sortOptionsToUrls = {
+                            default: "/shop/",
+                            az: `/shop/?page=${currentPage - 1}&search=${search}&category=${category}&sortBy=az`,
+                            za: `/shop/?page=${currentPage - 1}&search=${search}&category=${category}&sortBy=za`,
+                            priceasc: `/shop/?page=${currentPage - 1}&search=${search}&category=${category}&sortBy=price-asc`,
+                            pricedesc: `/shop/?page=${currentPage - 1}&search=${search}&category=${category}&sortBy=price-desc`,
+                        };
+                  
+                        // Get the corresponding URL for the selected sorting option
+                        const url = sortOptionsToUrls[selectedValue];
+                  
+                        if (url) {
+                            // Redirect to the selected URL
+                            window.location.href = url;
+                        }
+                    });
+                  </script>
+
 
                 <script>
                     function addToCart(id) {
@@ -189,10 +263,12 @@
 
                                         cartMessage.className = `position-fixed bg-${data.status} text-white p-2 rounded`;
                                         cartMessage.style.display = "block";
-
                                         setTimeout(function () {
                                             cartMessage.style.display = "none";
-                                        }, 3000);
+                                        }, 1000);
+
+                                      
+
                                     } else {
                                         console.error("Unexpected data format");
                                     }
@@ -204,3 +280,46 @@
                     }
 
                 </script>
+
+
+
+<script>
+    function toggleWishlist(id) {
+    const productId = id;
+    const url = `/wishlist/toggle/${productId}`;
+    const wishlistButton = document.getElementById(productId);
+    const cartMessage = document.getElementById("wishlist-message");
+  
+    fetch(url, {
+        method: "GET",
+    })
+        .then((response) => {
+            if (response.ok) {
+                return response.json(); 
+            } else {
+                console.error("Failed");
+            }
+        })
+        .then((data) => {
+            if (data) {
+              if (data.isInWishlist) {
+                wishlistButton.classList.add("text-danger")
+              } else {
+                wishlistButton.classList.remove("text-danger")
+              }
+                const iconClass = data.isInWishlist ? "text-danger" : "";
+                cartMessage.innerHTML = data.message;
+                cartMessage.className = `position-fixed bg-${data.status} text-white p-2 rounded`;
+                cartMessage.style.display = "block";
+                setTimeout(function () {
+                    cartMessage.style.display = "none";
+                }, 3000);
+            } else {
+                console.error("Unexpected data format");
+            }
+        })
+        .catch((error) => {
+            console.error("An error occurred:", error);
+        });
+  }
+  </script>

@@ -1,0 +1,79 @@
+<section class="content-main" style="margin-left: 250px;">
+    <div class="content-header">
+        <div>
+            <h2 class="content-title card-title">Category Offers </h2>
+        </div>
+
+    </div>
+    <div class="card-body">
+        <table class="table table-bordered">
+            <thead>
+                <tr>
+                   
+                    <th>Name</th>
+                    <th>Offer Percentage</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                <% categories.forEach((category) => { %>
+                    <tr>
+                      
+                      <td><%= category.title%></td>
+                        <td>
+                            <!-- <label for="<%= `categoryOfferInput_${category._id}` %>">Category Offer Percentage:</label> -->
+                            <input type="text" placeholder="Enter Offer Percentage" class="form-control" id="<%= `categoryOfferInput_${category._id}` %>" name="categoryOfferPercentage" style="width: auto;">
+                        </td> 
+                      <td>
+                        <div>
+                            <button class="btn btn-primary btn-sm-rounded"  onclick="applyCategoryOffer('<%= category._id %>')">Apply Offer</button>
+                        </div>
+                      </td>
+                    </tr>
+                <% }) %>
+               
+            </tbody>
+        </table>
+    </div>
+</section>
+
+
+<script>
+    async function applyCategoryOffer(categoryId) {
+  try {
+    const categoryOfferInput = document.getElementById(`categoryOfferInput_${categoryId}`);
+    const offerPercentage = categoryOfferInput.value;
+
+    const response = await fetch('/admin/categoryOffer', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        categoryId: categoryId,
+        offerPercentage: offerPercentage,
+      }),
+    });
+
+    if (response.ok) {
+      const result = await response.json();
+      console.log(result);
+      const messagesElement = document.getElementById('messages');
+      messagesElement.textContent = result.message;
+      // window.location.reload();
+      setTimeout(() => {
+        messagesElement.textContent="";
+      }, 2000);
+    } else {
+      const result = await response.json();
+      console.error('Error applying category offer:', result.message);
+      const messagesElement = document.getElementById('messages');
+      messagesElement.textContent = result.message;
+    }
+  } catch (error) {
+    console.error('Error applying category offer:', error.message);
+    const messagesElement = document.getElementById('messages');
+    messagesElement.textContent = 'An unexpected error occurred.';
+  }
+}
+</script>

@@ -27,7 +27,7 @@ const findProductById = async (productId)=>{
 
 const incrementQuantity = async (userId,productId,res)=>{
     const updatedProduct = await findCartItem(userId, productId);
-    console.log(updatedProduct);
+    // console.log(updatedProduct);
 
     if(!updatedProduct){
         return res.json({message:"Product not found in cart", status:"error"});
@@ -159,7 +159,7 @@ exports.addToCart = asynhandler(async(req,res)=>{
         }
 
         let cart = await Cart.findOne({user:userId});
-        console.log(cart);
+        // console.log(cart);
 
         if(!cart){
             cart = await Cart.create({user:userId, products:[{product:productId,quantity:1}],});
@@ -178,7 +178,7 @@ exports.addToCart = asynhandler(async(req,res)=>{
         await cart.save();
         // console.log(cart);
     }
-    req.flash("sucess",`Product added to cart`)
+    req.flash("success",'Product added to cart')
     res.json({ message: "Product Added to Cart", count: cart.products.length, status: "success" });
 
     } catch (error) {

@@ -27,45 +27,224 @@
     <h2 class="mb-4">Add New Address</h2>
 
     <!-- Address Form -->
-    <form action="/add-address" method="post">
+    <form action="/add-address" method="post" id="addaddressform">
       <div class="row">
         <div class="col-md-6">
           <div class="form-group">
             <label for="inputName">Name</label>
             <input type="text" class="form-control" id="name" name="name" placeholder="Enter Name" required>
+            <p class="text-danger" id="nameError"></p>
           </div>
           <div class="form-group">
             <label for="inputStreet">Street</label>
             <input type="text" class="form-control" id="street" name="street" placeholder="Enter Street" required>
+            <p class="text-danger" id="streetError"></p>
+
           </div>
           <div class="form-group">
             <label for="inputCity">City</label>
             <input type="text" class="form-control" id="city" name="city" placeholder="Enter City" required>
+            <p class="text-danger" id="cityError"></p>
           </div>
           <div class="form-group">
             <label for="inputState">State</label>
             <input type="text" class="form-control" id="state" name="state" placeholder="Enter State" required>
+            <p class="text-danger" id="stateError"></p>
           </div>
         </div>
         <div class="col-md-6">
           <div class="form-group">
             <label for="inputPincode">Pincode</label>
             <input type="text" class="form-control" id="pincode" name="pincode" placeholder="Enter Pincode" required>
+            <p class="text-danger" id="pincodeError"></p>
           </div>
           <div class="form-group">
             <label for="inputLandmark">Landmark</label>
             <input type="text" class="form-control" id="landmark" name="landmark" placeholder="Enter Landmark">
+            <p class="text-danger" id="landmarkError"></p>
           </div>
+
           <div class="form-group">
             <label for="inputMobile">Mobile Number</label>
-            <input type="tel" class="form-control" id="mobile" name="mobile"  placeholder="Enter Mobile Number" required>
+            <input type="tel" class="form-control" id="mobile" name="mobile" placeholder="Enter Mobile Number" required>
+            <p class="text-danger" id="mobileError"></p>
           </div>
+          
           <div class="form-group">
             <label for="inputAltMobile">Alternative Mobile Number</label>
-            <input type="tel" class="form-control" id="alternativenumber"  name="alternativenumber" placeholder="Enter Alternative Mobile Number">
+            <input type="tel" class="form-control" id="alternativenumber" name="alternativenumber" placeholder="Enter Alternative Mobile Number" required>
+            <p class="text-danger" id="altnumError"></p>
           </div>
+
         </div>
       </div>
-      <button type="submit" class="btn btn-primary">Save Address</button>
+      <div>
+        <button type="submit" class="btn btn-primary" id="submit">Save Address</button>
+        <p class="text-danger" id="formErrorMessage"></p>
+      </div>
     </form>
   </div>
+
+  <script>
+    document.addEventListener("DOMContentLoaded", function () {
+      const addressForm = document.getElementById("addaddressform");
+      const nameInput = document.getElementById("name");
+      const streetInput = document.getElementById("street");
+      const cityInput = document.getElementById("city");
+      const stateInput = document.getElementById("state");
+      const pincodeInput = document.getElementById("pincode");
+      const mobileInput = document.getElementById("mobile");
+      const altmobileInput = document.getElementById("alternativenumber");
+  
+      const addAddressButton = document.getElementById("submit");
+      const nameError = document.getElementById("nameError");
+      const streetError = document.getElementById("streetError");
+      const cityError = document.getElementById("cityError");
+      const stateError = document.getElementById("stateError");
+      const pincodeError = document.getElementById("pincodeError");
+      const mobileError = document.getElementById("mobileError");
+      const altmobileError = document.getElementById("altnumError");
+
+      const formErrorMessage = document.getElementById("formErrorMessage");
+  
+      function validateName() {
+        const nameValue = nameInput.value.trim();
+        const isValidName = /^[a-zA-Z\s]*$/.test(nameValue);
+
+        if (nameValue === "") {
+         nameError.textContent = "Name is required";
+        } else if (!isValidName) {
+         nameError.textContent = "Name should only contain alphabetic characters";
+        } else {
+         nameError.textContent = "";
+        }
+        validateForm();
+     }
+
+  
+      function validateStreet() {
+        const streetValue = streetInput.value.trim();
+        if (streetValue === "") {
+          streetError.textContent = "Street is required";
+        } else if (/^\s+$/.test(streetValue)) {
+          streetError.textContent = "Street cannot be just spaces";
+        } else {
+          streetError.textContent = "";
+        }
+        validateForm();
+      }
+  
+      // Similar validation functions for city, state, pincode, and mobile...
+      function validateCity() {
+  const cityValue = cityInput.value.trim();
+  const isValidCity = /^[a-zA-Z\s]*$/.test(cityValue);
+
+  if (cityValue === "") {
+    cityError.textContent = "City is required";
+  } else if (!isValidCity) {
+    cityError.textContent = "City should only contain alphabetic characters";
+  } else {
+    cityError.textContent = "";
+  }
+  validateForm();
+}
+
+function validateState() {
+  const stateValue = stateInput.value.trim();
+  const isValidState = /^[a-zA-Z\s]*$/.test(stateValue);
+
+  if (stateValue === "") {
+    stateError.textContent = "State is required";
+  } else if (!isValidState) {
+    stateError.textContent = "State should only contain alphabetic characters";
+  } else {
+    stateError.textContent = "";
+  }
+  validateForm();
+}
+
+
+
+    function validatePincode() {
+      const pincodeValue = pincodeInput.value.trim();
+      if (pincodeValue === "") {
+        pincodeError.textContent = "Pincode is required";
+      } else if (!/^\d{6}$/.test(pincodeValue)) {
+        pincodeError.textContent = "Enter a valid 6-digit pincode";
+      } else {
+        pincodeError.textContent = "";
+      }
+      validateForm();
+    }
+
+    function validateMobile() {
+      const mobileValue = mobileInput.value.trim();
+      if (mobileValue === "") {
+        mobileError.textContent = "Mobile number is required";
+      } else if (!/^\d{10}$/.test(mobileValue)) {
+        mobileError.textContent = "Enter a valid mobile number";
+      } else {
+        mobileError.textContent = "";
+      }
+      validateForm();
+    }
+
+
+function validateAltMobile() {
+  const altMobileValue = altmobileInput.value.trim();
+  if (altMobileValue === "") {
+    altmobileError.textContent = "Alternative Mobile number is required";
+  } else if (!/^\d{10}$/.test(altMobileValue)) {
+    altmobileError.textContent = "Enter a valid 10-digit alternative mobile number";
+  } else {
+    altmobileError.textContent = "";
+  }
+  validateForm();
+}
+
+  
+function validateForm() {
+        const errors = [
+          nameError.textContent,
+          streetError.textContent,
+          cityError.textContent,
+          stateError.textContent,
+          pincodeError.textContent,
+          mobileError.textContent,
+          altmobileError.textContent
+        ];
+  
+        const isFormValid = errors.every(error => error === "");
+  
+        if (isFormValid) {
+          addAddressButton.disabled = false;
+          formErrorMessage.textContent = "";
+        } else {
+          addAddressButton.disabled = true;
+          formErrorMessage.textContent = "Cannot add address. Please fill out the form correctly.";
+        }
+      }
+  
+      // Event listeners for input validation
+      nameInput.addEventListener("input", validateName);
+      streetInput.addEventListener("input", validateStreet);
+      // Add similar event listeners for city, state, pincode, mobile
+      cityInput.addEventListener("input", validateCity);
+    stateInput.addEventListener("input", validateState);
+    pincodeInput.addEventListener("input", validatePincode);
+    mobileInput.addEventListener("input", validateMobile);
+    altmobileInput.addEventListener("input", validateAltMobile);
+  
+    addressForm.addEventListener("submit", function (event) {
+      // event.preventDefault(); 
+
+      // Validate the form
+      if (validateForm()) {
+        // If the form is valid, submit the form
+        this.submit();
+      }
+    });
+
+    });
+  </script>
+  

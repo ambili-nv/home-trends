@@ -13,7 +13,7 @@ const methodOverride = require("method-override");
 const nocache = require("nocache");
 const Cart = require("./models/cartModel");
 const Category = require("./models/categoryModel");
-
+const Razorpay = require('razorpay')
 
 mongoose.connect('mongodb://127.0.0.1:27017/home_trend');
 
@@ -112,6 +112,9 @@ const { roles } = require("./utils/constants");
 
 
 
+// app.use((req,res)=>{
+//     res.render("404",{title:"404", page:"404"});
+// });
 
 
 app.listen(PORT,()=>{

@@ -19,9 +19,11 @@ passport.use(
             }
 
             const isPasswordValid = await user.isPasswordMatched(password);
+            console.log(isPasswordValid,"ispasswordvalid");
             if (!isPasswordValid) {
                 return done(null, false, { message: "Incorrect Password" });
             }
+            
 
             return done(null, user);
         } catch (error) {

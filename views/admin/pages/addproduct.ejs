@@ -87,12 +87,22 @@
                             </div>
                             <div class="col-md-9">
                                 <div class="mb-4">
-                                    <label class="form-label">Images</label>
-                                    <input class="form-control" type="file" name="images" id="image" multiple required>
+                                    <label for="productImage" class="form-label">Images</label>
+                                    <input class="form-control" type="file" name="images" id="productImage"  accept="image/*" multiple required
+                                    onchange="previewImages('productImage', 'preview')"
+                                    />
                                     <p class="text-danger" id="imageError"></p>
                                 </div>
                             </div>
                         </div>
+
+                        <div class="col-md-9">
+                            <!-- Image Preview Container with Bootstrap classes -->
+                            <div class="mt-3">
+                                <div id="preview" class="d-flex flex-wrap"></div>
+                            </div>
+                        </div>
+
                         <div class="" mb-4 mt-0"">
                             <div>
                                 <button type="submit" class="btn btn-primary mt-2" id="submit">Upload Product</button>
@@ -201,7 +211,7 @@
         function validatequantity() {
             const quantityValue = parseFloat(quantityInput.value); // Parse the value as a float
 
-            if (isNaN(quantityValue) || quantityValue < 0) {
+            if (isNaN(quantityValue) || quantityValue <= 0) {
                 quantityError.textContent = "Quantity must be a positive numeric value";
             } else {
                 quantityError.textContent = "";
@@ -261,4 +271,40 @@
     });
 
 
+</script>
+
+
+
+
+
+<script>
+    function previewImages(inputId, previewId) {
+        var input = document.getElementById(inputId);
+        var preview = document.getElementById(previewId);
+
+        // Clear any previous previews
+        preview.innerHTML = "";
+
+        if (input.files && input.files.length > 0) {
+            for (var i = 0; i < input.files.length; i++) {
+                var reader = new FileReader();
+                var imageElement = document.createElement("img");
+
+                // Use a closure to capture the current value of 'i'
+                (function (index) {
+                    reader.onload = function (e) {
+                        var imageElement = document.createElement("img");
+                        imageElement.src = e.target.result;
+                        imageElement.alt = "Image Preview";
+                        imageElement.className = "img-thumbnail";
+                        imageElement.style.maxWidth = "200px";
+                        imageElement.style.maxHeight = "200px";
+                        preview.appendChild(imageElement); // Append to the preview div
+                    };
+                })(i);
+
+                reader.readAsDataURL(input.files[i]);
+            }
+        }
+    }
 </script>

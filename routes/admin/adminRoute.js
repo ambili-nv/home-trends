@@ -2,17 +2,21 @@ const express = require('express');
 const router = express();
 
 const adminController = require('../../controllers/admin/adminController');
-const orderController = require('../../controllers/admin/orderController')
+const orderController = require('../../controllers/admin/orderController');
+const couponController = require('../../controllers/admin/couponController');
 const { uploadMultiple, uploadSingle,upload } = require('../../config/upload');
 const { body } = require('express-validator');
+
+
+
+
+
 router.use((req, res, next) => {
     req.app.set("layout", "admin/layout");
     next()
 })
 
 router.get("/", adminController.homepage);
-
-
 router.get("/dashboard", adminController.dashboard);
 
 
@@ -26,13 +30,13 @@ router.get("/dashboard", adminController.dashboard);
 //GET methods
 router.get('/categories',adminController.categories);
 router.get('/addcategory',adminController.addcategorypage);
-router.get("/edit/:id", adminController.editcategorypage);
+router.get("/category/edit/:id", adminController.editcategorypage);
 
 
 router.post('/addcategory',adminController.addCategory);
 router.put("/unlist/:id",adminController.unlist);
 router.put("/list/:id",adminController.list);
-router.put("/edit/:id", adminController.editcategory);
+router.put("/category/edit/:id", adminController.editcategory);
 router.delete("/delete/:id", adminController.deleteCategory);
 
 //Product
@@ -72,5 +76,21 @@ router.put("/unblock/:id",adminController.unblockCustomer);
 router.get("/orderlist", orderController.ordersListPage);
 router.get("/edit-order/:id", orderController.editOrder);
 router.put("/order/update/:id", orderController.updateOrderStatus);
+
+
+//Coupon Route
+router.get("/coupon",couponController.couponPage);
+router.get("/addcoupon",couponController.addCouponPage);
+
+router.post("/addcoupon",couponController.createCoupon);
+router.get("/editcoupon/:id",couponController.editCouponPage);
+router.post("/editcoupon/:id",couponController.updateCoupon);
+router.delete("/deletecoupon/:id",couponController.deleteCoupon);
+
+
+//Offers
+// router.get("/categoryoffers",adminController.offerPage)
+// router.post('/categoryOffer',adminController.categoryOffer);
+
 
 module.exports=router;

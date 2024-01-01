@@ -19,7 +19,7 @@ const ensureUser = (req, res, next) => {
 
 const isBlockedUser = (req, res, next) => {
     if (req?.user?.isBlocked) {
-        res.redirect(`/auth/blocked/${req.user._id}`);
+        res.redirect(`/blocked/${req.user._id}`);
     } else {
         next();
     }

@@ -1,3 +1,11 @@
+<style>
+    /* Custom CSS */
+.product-wrapper {
+    padding: 20px; /* Adjust the padding value as needed */
+}
+
+</style>
+
 <%- include('../partials/header') %>
     <div class="slider-area">
         <div class="slider-active owl-carousel">
@@ -118,7 +126,10 @@
 
 
 
-
+    <div class="product-wrapper mb-30 p-3"> <!-- Added 'p-3' for padding -->
+        <!-- Existing product content -->
+   
+    
 
 
 
@@ -140,9 +151,13 @@
 
                                 <div class="product-action">
 
-                                    <a class="animate-left" title="Wishlist" href="#">
-                                        <i class="pe-7s-like"></i>
-                                    </a>
+                                    <a  
+                                          id="wishlistButton"
+                                          class="animate-left"
+                                          title="Wishlist"
+                                          onclick="toggleWishlist('<%= product._id %>')">
+                                          <i class="pe-7s-like"></i>
+                                     </a>
 
                                     <% if (product.quantity) { %>
                                         <a class="animate-top" title="Add To Cart"  onclick="addToCart(`<%= product._id %>`)" >
@@ -177,9 +192,9 @@
                                 </div>
 
                                 <div class="d-flex justify-content-between">
-                                    <span class="text-decoration-line-through text-secondary">₹
-                                        <%= product.productPrice %>
-                                    </span>
+                                    <% if (product.productPrice !== product.salePrice) { %>
+                                        <span class="text-decoration-line-through text-secondary">₹ <%= product.productPrice %></span>
+                                    <% } %>
                                     <span class="card-text h4">₹ <%= product.salePrice %></span>
                                 </div>
                             </div>
@@ -192,7 +207,7 @@
         
 
     </div>
-    
+</div>
 
     <div class="view-all-product text-center">
         <a href="/shops">View All Product</a>
@@ -303,3 +318,44 @@
         }
 
     </script>
+
+<script>
+    function toggleWishlist(id) {
+    const productId = id;
+    const url = `/wishlist/toggle/${productId}`;
+    const wishlistButton = document.getElementById(productId);
+    const cartMessage = document.getElementById("wishlist-message");
+  
+    fetch(url, {
+        method: "GET",
+    })
+        .then((response) => {
+            if (response.ok) {
+                return response.json(); 
+            } else {
+                console.error("Failed");
+            }
+        })
+        .then((data) => {
+            if (data) {
+              if (data.isInWishlist) {
+                wishlistButton.classList.add("text-danger")
+              } else {
+                wishlistButton.classList.remove("text-danger")
+              }
+                const iconClass = data.isInWishlist ? "text-danger" : "";
+                cartMessage.innerHTML = data.message;
+                cartMessage.className = `position-fixed bg-${data.status} text-white p-2 rounded`;
+                cartMessage.style.display = "block";
+                setTimeout(function () {
+                    cartMessage.style.display = "none";
+                }, 3000);
+            } else {
+                console.error("Unexpected data format");
+            }
+        })
+        .catch((error) => {
+            console.error("An error occurred:", error);
+        });
+  }
+  </script>

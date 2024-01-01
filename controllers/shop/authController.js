@@ -8,6 +8,9 @@ const generateOTP = require("../../utils/otpGenerator");
 const sendEmail = require("../../utils/emailSender");
 const validateMongoDbId = require('../../utils/validateMongoDbId');
 const crypto = require("crypto");
+const bcrypt = require("bcrypt");
+const Wallet = require('../../models/walletModel');
+const WalletTransaction = require('../../models/walletTransactionModel');
 
 
 //Login Page
@@ -63,6 +66,8 @@ exports.userRegister = asynchandler(async (req, res) => {
 
             if (!existingUser) {
                 const newUser = await User.create(req.body);
+                const wallet = await Wallet.create({user:newUser._id});
+                console.log(wallet,"wallet created");
                 await newUser.save();
                 const otp = await Otp.create({
                     user_id: newUser._id,
@@ -70,6 +75,8 @@ exports.userRegister = asynchandler(async (req, res) => {
                     otp_code: generateOTP(),
                     expiration_time: Date.now() + 5 * 60 * 1000,
                 });
+
+                console.log(otp,"is the otp");
 
 
                 try {
@@ -149,7 +156,7 @@ exports.verifyOtp = asynchandler(async (req, res) => {
         isused: false,
       });
 
-
+   
 
       if (!otp) {
         req.flash("danger", "invalid OTP");
@@ -162,13 +169,49 @@ exports.verifyOtp = asynchandler(async (req, res) => {
         isEmailVerified: true,
       });
 
-      // req.flash("success", "Email Vefifed successfully You can login now");
+      const referalCode = user.refferedBy;
+      console.log(referalCode,"referalcode");
+      
+
+      if(referalCode) {
+        const refferedUser = await User.findOne({refferalId:referalCode});
+        console.log(refferedUser,"refferedUser");
+
+        const refferedUserWallet = await Wallet.findOneAndUpdate({user:refferedUser._id},{$inc:{balance:100}});
+        console.log(refferedUserWallet,"refferedUserWallet");
+
+        const refferedUserWalletTransaction = await WalletTransaction.create({
+          wallet:refferedUserWallet._id,
+          amount:100,
+          type:"credit"
+        });
+        console.log(refferedUserWalletTransaction,"refferedUserWalletTransaction");
+
+
+        const userWallet = await Wallet.findOneAndUpdate({user:user._id},{$inc:{balance:50}});
+        console.log(userWallet,"userWallet");
+
+        const userWalletTransaction = await WalletTransaction.create({
+          wallet:userWallet._id,
+          amount:50,
+          type:"credit"
+        })
+
+        console.log(userWalletTransaction,"userWalletTransaction");
+
+      }
+
+
+
+      req.flash("success", "Email Vefifed successfully You can login now");
       res.redirect("/login");
 
     } catch (error) {
         throw new Error(error);
       }
 });
+
+
 
 //Resend Email
 //POST Method
@@ -280,71 +323,6 @@ exports.resendEmail = asynchandler(async (req, res) => {
 
 
 
-
-
-
-
-  exports.resetPasswordpage = asynchandler(async (req, res) => {
-    try {
-      const token = crypto
-        .createHash("sha256")
-        .update(req.params.token)
-        .digest("hex");
-      const user = await User.findOne({
-        passwordResetToken: token,
-        passwordResetTokenExpires: { $gt: Date.now() },
-      });
-  
-      if (!user) {
-        req.flash("warning", "Token is invalid or has expired");
-       
-      }
-
-      res.render("/shop/pages/userprofile", {
-        title: "Reset password",
-        page: "User Profile",
-        token : req.params.token
-    })
-    } catch (error) {
-      throw new Error(error);
-    }
-  });
-
-
-
-
-
-
-
-  exports.resetPassword = asynchandler(async (req, res) => {
-    const token = req.params.token;
-    try {
-      const user = await User.findOne({
-        passwordResetToken: token,
-        passwordResetTokenExpires: { $gt: Date.now() },
-      });
-  
-      if (!user) {
-        req.flash("warning", "Token is invalid or has expired");
-        // res.redirect("/auth/forgot-password");
-      }
-  
-      user.password = req.body.password;
-      user.passwordResetToken = null;
-      user.passwordResetTokenExpires = null;
-      user.passwordChangedAt = Date.now();
-  
-      await user.save();
-  
-      req.flash("success", "Password changed");
-      res.redirect("/login");
-    } catch (error) {
-      throw new Error(error);
-    }
-  });
-
-
-
 //Logout 
 //GET MEthod
 
@@ -364,3 +342,109 @@ exports.logoutUser = asynchandler(async (req, res, next) => {
 
 
 
+  exports.blockedUser = asynchandler(async (req, res) => {
+    try {
+      const id = req.params.id;
+      validateMongoDbId(id);
+      const user = await User.findById(id);
+      res.render("shop/pages/blocked", {
+        title: "Blocked",
+        page: "blocked",
+        user,
+      });
+    } catch (error) {
+      throw new Error(error);
+    }
+  });
+
+
+
+
+
+
+
+
+
+
+/////////////////////////////////////////////////
+//change password
+
+// exports. UpdatePassword = async (req, res) => {
+//   try {
+//       const { oldPassword, newPassword } = req.body;
+//       const userId = req.user.id;
+//       const user = await User.findById(userId);
+
+
+//       console.log('Provided Old Password:', oldPassword);
+
+//       // Compare the old password
+//       if (!oldPassword) {
+//           console.error('Old password not provided');
+//           return res.status(400).json({ error: 'Old password not provided' });
+//       }
+
+//       const isPasswordValid = await user.isPasswordMatched(oldPassword);
+
+//       if (!isPasswordValid) {
+//           return res.status(400).json({ error: 'Old password is incorrect' });
+//       }
+
+//       // Hash and update the new password
+//       try {
+//           const saltRounds = 10;
+//           const hashedNewPassword = await bcrypt.hash(newPassword, saltRounds);
+//           console.log(newPassword)
+//           user.password = hashedNewPassword;
+
+//       } catch (hashError) {
+//           console.error('Error hashing new password:', hashError);
+//           return res.status(500).json({ error: 'Error hashing new password' });
+//       }
+
+//       // Save the updated user
+//       await user.save();
+
+//       res.redirect('/login');
+//   } catch (error) {
+//       console.error(error);
+//       res.status(500).json({ error: 'Internal Server Error' });
+//     }
+// };
+
+
+
+
+exports.updatePassword = async (req, res) => {
+  try {
+    const { oldPassword, newPassword } = req.body;
+    const userId = req.user.id;
+    const user = await User.findById(userId);
+
+    if (!oldPassword || !newPassword) {
+      console.error('Old password or new password not provided');
+      return res.status(400).json({ error: 'Old password or new password not provided' });
+    }
+
+    // Compare the old password
+    const isPasswordValid = await user.isPasswordMatched(oldPassword);
+    if (!isPasswordValid) {
+      return res.status(400).json({ error: 'Old password is incorrect' });
+    }
+
+    // Hash the new password
+    const saltRounds = 10;
+    const hashedNewPassword = await bcrypt.hash(newPassword, saltRounds);
+    console.log(hashedNewPassword,"hashed");
+    // Update user's password with the hashed new password
+    user.password = hashedNewPassword;
+   console.log(user.password,"userPassword");
+    // Save the updated user
+    await user.save();
+
+    res.json({ message: 'Password updated successfully' });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+};

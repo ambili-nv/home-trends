@@ -1,0 +1,71 @@
+<section class="content-main" style="margin-left: 250px;">
+    <div class="content-header">
+
+        <div>
+            <h2 class="content-title card-title">Coupons </h2>
+            <p>Lorem ipsum dolor sit amet.</p>
+        </div>
+     
+    </div>
+    <div class="card mb-4">
+        <header class="card-header">
+            <div class="row gx-3">
+        </header> <!-- card-header end// -->
+        <div class="card-body">
+            <%- include('../partials/flash-message.ejs') %>
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th>Coupon Code</th>
+                            <th scope="col">Type </th>
+                            <th scope="col">Description</th>
+                            <th scope="col">Amount</th>
+                            <th scope="col">Min Amount</th>
+                            <th scope="col">Max Amount</th>
+                            <th scope="col">End Date</th>
+                            <th scope="col">Action</th>
+                            <!-- <th scope="col" class="text-end"> Action </th> -->
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <% coupons?.forEach(coupon =>{ %>
+                        <tr>
+                            <td  class="align-middle"><%= coupon?.code %></td>
+                            <td  class="align-middle"><%= coupon?.type.toUpperCase() %></td>
+                            <td class="align-middle">
+                                <%= coupon?.description %></td>
+                            <td class="align-middle">
+                                <%= coupon?.value %></td>
+                            <td  class="align-middle"><%= coupon?.minAmount %></td>
+                            <td  class="align-middle"><%= coupon?.maxAmount %></td>
+                            <td  class="align-middle"> <%= new
+                                Date(coupon?.expiryDate).toLocaleDateString('en-US',{year:'numeric',month:'long',day:'numeric'})
+                                %></td>
+                            <td class="text-center d-flex justify-content-between">
+                                <a href="/admin/editcoupon/<%= coupon?._id %>"
+                                    class="btn btn-sm btn-primary">
+                                    Edit
+                                </a>
+                            </td>
+
+                            <td>
+                                <form
+                                  action="/admin/deletecoupon/<%= coupon?._id %>?_method=DELETE"
+                                  method="post"
+                                >
+                                  <button type="submit" class="btn btn-sm btn-danger ml-1">
+                                    <i class="bx bxs-trash"></i>
+                                  </button>
+                                </form>
+                              </td>
+                        </tr>
+                            <% }) %>
+                           
+                    </tbody>
+                </table>
+            </div> <!-- table-responsive //end -->
+        </div> <!-- card-body end// -->
+    </div> <!-- card end// -->
+    
+</section>

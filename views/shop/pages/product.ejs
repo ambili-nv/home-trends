@@ -97,17 +97,23 @@
                             <a class="btn-hover-black"onclick="alert('You will be notified')">Notify me</a>
                             <% }else{ %>
 
-                                <a
-                                  class="btn-hover-black"
-                                  onclick="addToCart(`<%= product._id %>`)"
-                                  >add to cart</a
-                                >
+                              <a
+                              class="animate-top"
+                              title="Add To Cart"
+                              onclick="addToCart(`<%= product._id %>`)"
+                              
+                            >
+                              <i class="pe-7s-cart"></i>
+                            </a>
                                 <% } %>
                         </div>
 
 
                         <div class="quickview-btn-wishlist">
-                            <a class="btn-hover" href="#"><i class="pe-7s-like"></i></a>
+                            <a
+                            id="wishlistButton" 
+                            class="btn-hover"  onclick="toggleWishlist('<%= product._id %>')">
+                            <i class="pe-7s-like"></i></a>
                         </div>
                     </div>
 
@@ -144,47 +150,88 @@
 
 <script>
   function addToCart(id) {
-    const productId = id;
-    const url = `/cart/add/${productId}`;
-    const cartMessage = document.getElementById("cart-message");
+      const productId = id;
+      const url = `/cart/add/${productId}`;
+      const cartCount = document.getElementById("cartCount");
+      const cartMessage = document.getElementById("cart-message");
 
-    fetch(url, {
-      method: "GET",
-    })
-      .then((response) => {
-        if (response.ok) {
-          return response.json(); // Assuming server sends JSON
-        } else {
-          console.error("Failed");
-        }
+      fetch(url, {
+          method: "GET",
       })
-      .then((data) => {
-        if (data) {
-          console.log(data["message"]);
+          .then((response) => {
+              if (response.ok) {
+                  return response.json(); // Assuming server sends JSON
+              } else {
+                  console.error("Failed");
+              }
+          })
+          .then((data) => {
+              if (data) {
+                  console.log(data["message"]);
 
-          // Check if 'count' and 'message' properties exist in data
-          if (data.count && data.message) {
-            // cartCount.innerText = data.count;
-            cartMessage.innerHTML = data.message;
+                  // Check if 'count' and 'message' properties exist in data
+                  if (data.count && data.message) {
+                      cartCount.innerText = data.count;
+                      cartMessage.innerText = data.message;
 
-            cartMessage.className = `position-fixed bg-${data.status} text-white p-2 rounded`;
-            cartMessage.style.display = "block";
+                      cartMessage.className = `position-fixed bg-${data.status} text-white p-2 rounded`;
+                      cartMessage.style.display = "block";
 
-            setTimeout(function () {
-              cartMessage.style.display = "none";
-            }, 3000);
-          } else {
-            console.error("Unexpected data format");
-          }
-        }
-      })
-      .catch((error) => {
-        console.error("An error occurred:", error);
-      });
+                      setTimeout(function () {
+                          cartMessage.style.display = "none";
+                      }, 3000);
+                  } else {
+                      console.error("Unexpected data format");
+                  }
+              }
+          })
+          .catch((error) => {
+              console.error("An error occurred:", error);
+          });
   }
+
 </script>
 
-
+<script>
+    function toggleWishlist(id) {
+    const productId = id;
+    const url = `/wishlist/toggle/${productId}`;
+    const wishlistButton = document.getElementById(productId);
+    const cartMessage = document.getElementById("wishlist-message");
+  
+    fetch(url, {
+        method: "GET",
+    })
+        .then((response) => {
+            if (response.ok) {
+                return response.json(); 
+            } else {
+                console.error("Failed");
+            }
+        })
+        .then((data) => {
+            if (data) {
+              if (data.isInWishlist) {
+                wishlistButton.classList.add("text-danger")
+              } else {
+                wishlistButton.classList.remove("text-danger")
+              }
+                const iconClass = data.isInWishlist ? "text-danger" : "";
+                cartMessage.innerHTML = data.message;
+                cartMessage.className = `position-fixed bg-${data.status} text-white p-2 rounded`;
+                cartMessage.style.display = "block";
+                setTimeout(function () {
+                    cartMessage.style.display = "none";
+                }, 3000);
+            } else {
+                console.error("Unexpected data format");
+            }
+        })
+        .catch((error) => {
+            console.error("An error occurred:", error);
+        });
+  }
+  </script>
 		
 
 <%- include('../partials/footer') %>
