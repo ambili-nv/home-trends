@@ -13,12 +13,11 @@ const methodOverride = require("method-override");
 const nocache = require("nocache");
 const Cart = require("./models/cartModel");
 const Category = require("./models/categoryModel");
-const Razorpay = require('razorpay')
-
-mongoose.connect('mongodb://127.0.0.1:27017/home_trend');
+const Razorpay = require('razorpay');
 
 
 
+connectDatabase()
 
 
 const {ensureUser,

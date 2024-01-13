@@ -6,6 +6,7 @@ const connectDatabase = asyncHandler(async () => {
         mongoose.connect(process.env.DATABASE_URL);
         console.log("Database Connected Successfully");
     } catch (error) {
+        console.log("error",error);
         throw new Error();
     }
 });
