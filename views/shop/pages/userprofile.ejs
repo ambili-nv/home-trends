@@ -1,196 +1,153 @@
-
-
 <style>
-    .sidebar {
-      /* background-color: #f8f9fa; */
-      border-right: 1px solid #dee2e6;
-      height: 155vh;
-      padding: 20px;
-    }
-    .sidebar h4 {
-      margin-bottom: 10px;
-    }
-    .sidebar ul {
-      list-style-type: none;
-      padding: 0;
-    }
-    .sidebar li {
-      margin-bottom: 5px;
-    }
-    .main-content {
-      padding: 20px;
-    }
-    .bold-hr {
-  border: 0; 
-  border-top: 1px solid black; 
-  
-}
-.smaller-div {
-    width: 20%; /* Change this to your desired width */
-}
+  .sidebar {
+    /* background-color: #f8f9fa; */
+    border-right: 1px solid #dee2e6;
+    height: 155vh;
+    padding: 20px;
+  }
 
-  </style>
+  .sidebar h4 {
+    margin-bottom: 10px;
+  }
 
+  .sidebar ul {
+    list-style-type: none;
+    padding: 0;
+  }
 
+  .sidebar li {
+    margin-bottom: 5px;
+  }
 
+  .main-content {
+    padding: 20px;
+  }
 
-<div class="container-fluid">
+  .bold-hr {
+    border: 0;
+    border-top: 1px solid black;
+
+  }
+
+  .smaller-div {
+    width: 20%;
+    /* Change this to your desired width */
+  }
+</style>
+<%- include('../partials/header') %>
+
+  <div class="container-fluid">
     <div class="row">
       <div class="col-md-3 sidebar">
         <h4>Account Settings</h4>
         <ul>
-          <li class="mt-5"><h6>Account Details</h6></li> <hr class="bold-hr">
-          <li> <h6 >Address Details </h6>
+          <li class="mt-5">
+            <h6>Account Details</h6>
+          </li>
+          <hr class="bold-hr">
+          <li>
+            <h6>Address Details </h6>
             <div>
-                <a href="/address" class="dropdown-item">Address</a>
-                <!-- <a class="dropdown-item">Add Address</a> -->
-         </div>
-          </li><hr class="bold-hr">
-          <li> <h6>Wishlist</h6></li> <hr class="bold-hr">
-          <li><h6><a href="/orders">Orders</a> </h6></li><hr class="bold-hr">
-          <li><h6>Logout</h6></li>
-
-         
+              <a href="/address" class="dropdown-item">Address</a>
+              <!-- <a class="dropdown-item">Add Address</a> -->
+            </div>
+          </li>
+          <hr class="bold-hr">
+          <li>
+            <h6><a href="/wishlist">Wishlist</a></h6>
+          </li>
+          <hr class="bold-hr">
+          <li>
+            <h6><a href="/orders">Orders</a> </h6>
+          </li>
+          <hr class="bold-hr">
+          <li>
+            <h6><a href="/wallet">Wallet</a> </h6>
+          </li>
+          <hr class="bold-hr">
+          <li>
+            <h6><a href="/logout">Logout</a></h6>
+          </li>
         </ul>
       </div>
       <div class="col-md-9 main-content">
         <div>
-        <h2>User Profile</h2>
-        <form
-        action="/profile/edit/<%= user?._id %>?_method=PUT"
-        method="post"
-        class="mt-4"
-        enctype="multipart/form-data"
-        id="profileform"
-      >
-
-
-          <div class="smaller-div">
-            <img
-    src="<%= user?.image ? user?.image : '/shop/assets/img/user-img.jpg' %>"
-    id="user-avatar"
-    class="img-fluid rounded-circle text-center"
-    style="width: 150px; height: 150px;"
-  />
-            <img
-            src=""
-            id="image-preview"
-            class="img-fluid rounded-circle text-center"
-            style="display: none; width: 150px; height: 150px"
-          />
-
-          <input
-          type="file"
-          name="file"
-          id="image-input"
-          style="display: none"
-          accept="image/*"
-        />
-
-        <div>
-          <button
-            type="button"
-            class="btn btn-primary mt-2 h-auto"
-            id="change-avatar"
-          >
-            <%= user?.image ? "Change Profile Picture" : "Add Profile Picture"
-            %>
-          </button>
-
-
-
+          <h2>User Profile</h2>
+          <%- include('../partials/flash_msg') %>
+            <form action="/profile/edit/<%= user?._id %>?_method=PUT" method="post" class="mt-4"
+              enctype="multipart/form-data" id="profileform">
+              <div class="smaller-div">
+                <img src="<%= user?.image ? user?.image : '/shop/assets/img/user-img.jpg' %>" id="user-avatar"
+                  class="img-fluid rounded-circle text-center" style="width: 150px; height: 150px;" />
+                <img src="" id="image-preview" class="img-fluid rounded-circle text-center"
+                  style="display: none; width: 150px; height: 150px" />
+                <input type="file" name="file" id="image-input" style="display: none" accept="image/*" />
+                <div>
+                  <button type="button" class="btn btn-primary mt-2 h-auto" id="change-avatar">
+                    <%= user?.image ? "Change Profile Picture" : "Add Profile Picture" %>
+                  </button>
+                </div>
+              </div>
+              <div class="">
+                <div class="form-group">
+                  <label for="name" class="mt-3"><b>Name:</b></label>
+                  <input type="text" class="form-control col-md-6" id="name" name="name" value="<%= user?.name %>">
+                  <p class="text-danger" id="nameError"></p>
+                </div>
+                <div class="form-group">
+                  <label for="email" class="mt-3"><b>Email address:</b></label>
+                  <input type="email" class="form-control col-md-6" id="email" name="email" value="<%= user?.email %>"
+                    readonly>
+                </div>
+                <button type="submit" id="submit" class="btn btn-dark mt-4">Save Changes</button>
+                <p class="text-danger" id="formErrorMessage"></p>
+            </form>
         </div>
       </div>
-
-
-          
-
-    <div class="">
-      <div class="form-group">
-        <label for="name" class="mt-3"><b>Name:</b></label>
-        <input type="text" class="form-control col-md-6"
-          id="name"
-          name="name"
-          value="<%= user?.name %>">
-        <p class="text-danger" id="nameError"></p>
-      </div>
-    
-      <div class="form-group">
-        <label for="email" class="mt-3"><b>Email address:</b></label>
-        <input type="email" class="form-control col-md-6"
-          id="email"
-          name="email"
-          value="<%= user?.email %>"
-          readonly
-        >
-      </div>
-    
-      <button type="submit" id="submit" class="btn btn-dark mt-4">Save Changes</button>
-      <p class="text-danger" id="formErrorMessage"></p>
-    
-    </form>
-    </div>
-
-    </div>
-    
-    <div>
-      <div class="col-md-6">
-        <div class="mb-1 p-3 shadow rounded bg-light">
+      <div>
+        <div class="col-md-6">
+          <div class="mb-1 p-3 shadow rounded bg-light">
             <label for="email" class="form-label">Refferal ID</label>
             <div class="input-group"> <!-- Use an input group for proper alignment -->
-                <input
-                    type="refferal"
-                    class="form-control"
-                    id="referralCode"
-                    name="refferalCode"
-                    value="<%= user?.refferalId %>"
-                    readonly
-                />
-                <div class="input-group-append">
-                    <small class="btn text-secondary" id="copyButton">
-                        <i class="pe-7s-copy-file"></i>
-                    </small>
-                </div>
+              <input type="refferal" class="form-control" id="referralCode" name="refferalCode"
+                value="<%= user?.refferalId %>" readonly />
             </div>
             <div class="marquee-container">
-                <p class="text-success marquee">
-                    Invite a friend and earn 100 wallet cash.
-                </p>
+              <p class="text-success marquee">
+                Invite a friend and earn 100 wallet cash.
+              </p>
             </div>
+          </div>
         </div>
       </div>
-    </div>
+      <h2 class="reset-password-section bg-light p-3 mt-4">Reset Password</h2>
+      <form action="" method="put">
+        <div class="form-group">
+          <label for="newPassword" class="mt-3"> <b>Old Password:</b></label>
+          <input type="password" class="form-control col-md-6" id="oldPassword" name="oldPassword"
+            placeholder="Enter  password">
 
-        
-        <h2 class="mt-5">Reset Password</h2>
-         <form action="" method="put">
-          <div class="form-group">
-            <label for="newPassword" class="mt-3"> <b>Old Password:</b></label>
-            <input type="password" class="form-control col-md-6" id="oldPassword" name="oldPassword" placeholder="Enter new password">
-            
-          </div>
-          <div class="form-group">
-            <label for="confirmPassword" class="mt-3"><b> New Password:</b></label>
-            <input type="password" class="form-control col-md-6" id="newPassword" name="newPassword" placeholder="Confirm new password">
-            <p class="text-danger" id="newPasswordError"></p>
-          </div>
-          <button type="submit" class="btn btn-dark mt-4" id="submit" onclick="updatePassword()">Reset Password</button>
-          <p class="text-danger" id="formError"></p>
-        </form>
-      </div>
+        </div>
+        <div class="form-group">
+          <label for="confirmPassword" class="mt-3"><b> New Password:</b></label>
+          <input type="password" class="form-control col-md-6" id="newPassword" name="newPassword"
+            placeholder="Enter new password">
+          <p class="text-danger" id="newPasswordError"></p>
+        </div>
+        <button type="submit" class="btn btn-dark mt-4" id="submit" onclick="updatePassword()">Reset Password</button>
+        <p class="text-danger" id="formError"></p>
+      </form>
     </div>
   </div>
-
-
+  </div>
   <script>
-
-async function updatePassword() {
+    async function updatePassword() {
       const oldPassword = document.getElementById('oldPassword').value;
       const newPassword = document.getElementById('newPassword').value;
-           
+
       // Send a request to your server with oldPassword and newPassword
       // (using fetch, axios, or another HTTP library)
-  
+
       const response = await fetch('/changepassword', {
         method: 'PUT',
         headers: {
@@ -199,133 +156,100 @@ async function updatePassword() {
         },
         body: JSON.stringify({ oldPassword, newPassword }),
       });
-  
+
+      // window.location.reload();
+
       const result = await response.json();
       console.log(result);
     }
+  </script>
+
+  <script>
+    document.addEventListener("DOMContentLoaded", function () {
+      const imageInput = document.getElementById("image-input");
+      const imagePreview = document.getElementById("image-preview");
+      const userAvatar = document.getElementById("user-avatar");
+
+      // Add a click event listener to the "Change Profile Picture" button
+      document.getElementById("change-avatar").addEventListener("click", function () {
+        imageInput.click();
+      });
+
+      //  Add an event listener for the file input change event
+      imageInput.addEventListener("change", function () {
+        const file = imageInput.files[0];
+
+        if (file) {
+          const reader = new FileReader();
+
+          reader.onload = function (e) {
+            // Update the image preview with the selected image
+            imagePreview.src = e.target.result;
+            imagePreview.style.display = "block";
+            userAvatar.style.display = "none"; // Hide the user avatar
+          };
+
+          reader.readAsDataURL(file);
+        } else {
+          // No file selected, hide the image preview and show the user avatar
+          imagePreview.style.display = "none";
+          userAvatar.style.display = "block";
+        }
+      });
+
+    });
 
   </script>
 
 
-
-
-
-
-
-
-
-
   <script>
     document.addEventListener("DOMContentLoaded", function () {
-        const imageInput = document.getElementById("image-input");
-        const imagePreview = document.getElementById("image-preview");
-        const userAvatar = document.getElementById("user-avatar");
-  
-        // Add a click event listener to the "Change Profile Picture" button
-        document.getElementById("change-avatar").addEventListener("click", function () {
-            imageInput.click();
-        });
+      const profileform = document.getElementById("profileform");
+      const nameInput = document.getElementById("name");
 
+      const editprofileButton = document.getElementById("submit");
+      const nameError = document.getElementById("nameError");
 
+      const formErrorMessage = document.getElementById("formErrorMessage");
 
-          
-  
-  
-      //  Add an event listener for the file input change event
-        imageInput.addEventListener("change", function () {
-            const file = imageInput.files[0];
-  
-            if (file) {
-                const reader = new FileReader();
-  
-                reader.onload = function (e) {
-                    // Update the image preview with the selected image
-                    imagePreview.src = e.target.result;
-                    imagePreview.style.display = "block";
-                    userAvatar.style.display = "none"; // Hide the user avatar
-                };
-  
-                reader.readAsDataURL(file);
-            } else {
-                // No file selected, hide the image preview and show the user avatar
-                imagePreview.style.display = "none";
-                userAvatar.style.display = "block";
-            }
-        });
-
-        copyButton.addEventListener("click", function () {
-            const codeToCopy = referralCode.textContent;
-
-            const textArea = document.createElement("textarea");
-            textArea.value = codeToCopy;
-
-            document.body.appendChild(textArea);
-
-            textArea.select();
-            textArea.setSelectionRange(0, 99999);
-
-            document.execCommand("copy");
-
-            document.body.removeChild(textArea);
-
-            copyButton.innerText = "Copied!";
-        });
-
-      });  
-
-</script>      
-
-
-<script>
-  document.addEventListener("DOMContentLoaded",function(){
-    const profileform = document.getElementById("profileform");
-    const nameInput = document.getElementById("name");
-
-    const editprofileButton = document.getElementById("submit");
-    const nameError = document.getElementById("nameError");
-
-    const formErrorMessage = document.getElementById("formErrorMessage");
-
-    function validateName() {
+      function validateName() {
         const nameValue = nameInput.value.trim();
         const isValidName = /^[a-zA-Z\s]*$/.test(nameValue);
 
         if (nameValue === "") {
-         nameError.textContent = "Name is required";
+          nameError.textContent = "Name is required";
         } else if (!isValidName) {
-         nameError.textContent = "Name should only contain alphabetic characters";
+          nameError.textContent = "Name should only contain alphabetic characters";
         } else {
-         nameError.textContent = "";
+          nameError.textContent = "";
         }
         validateForm();
-     }
+      }
 
-    function validateForm(){
-      const errors = [
-        nameError.textContent
-      ];
+      function validateForm() {
+        const errors = [
+          nameError.textContent
+        ];
 
-      const isFormValid = errors.every(error => error ==="");
+        const isFormValid = errors.every(error => error === "");
 
-      if (isFormValid) {
+        if (isFormValid) {
           addAddressButton.disabled = false;
           formErrorMessage.textContent = "";
         } else {
           addAddressButton.disabled = true;
           formErrorMessage.textContent = "Cannot add address. Please fill out the form correctly.";
         }
-      
-      }
-        // Event listeners for input validation
-        nameInput.addEventListener("input", validateName);
 
-        addressForm.addEventListener("submit", function (event) {
-          if (validateForm()) {
-        // If the form is valid, submit the form
-        this.submit();
       }
-    });
-    
+      // Event listeners for input validation
+      nameInput.addEventListener("input", validateName);
 
-  })
-</script>
+      addressForm.addEventListener("submit", function (event) {
+        if (validateForm()) {
+          // If the form is valid, submit the form
+          this.submit();
+        }
+      });
+    })
+  </script>

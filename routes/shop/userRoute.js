@@ -75,6 +75,7 @@ router.get("/orders/:id", orderController.singleOrder);
 router.get("/orders/:id", orderController.cancelOrder);
 router.put("/orders/single/:id", orderController.cancelSingleOrder);
 router.put("/orders/return/:id", orderController.returnOrder);
+router.get("/download/:id", orderController.donwloadInvoice);
 
 
 

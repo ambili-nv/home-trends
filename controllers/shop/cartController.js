@@ -143,6 +143,7 @@ exports.cartpage = asynhandler(async(req,res)=>{
 
 exports.addToCart = asynhandler(async(req,res)=>{
     const productId = req.params.id;
+    
     // console.log(productId);
     const userId = req.user.id;
     // console.log(userId);
@@ -185,6 +186,8 @@ exports.addToCart = asynhandler(async(req,res)=>{
         throw new Error(error);
     }
 });
+
+
 
 
 //Remove From Cart

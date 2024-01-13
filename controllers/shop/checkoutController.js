@@ -15,15 +15,14 @@ const { check } = require("express-validator");
 
 exports.checkoutpage = asynchandler(async (req, res) => {
     try {
-      // console.log("inside checkout::::::::::::::::::::::::::::");
+      
       const userid = req.user._id;
-      // console.log(userid,"userid wallet");
+      
       const wallet = await Wallet.findOne({user:userid})
-      // console.log(`wallet is ${wallet}`);
+      
       const user = await User.findById(userid).populate("address");
       const cartItems = await checkoutHelper.getCartItems(userid);
       // let items = cartItems.products;
-      // console.log(items);
       // for (const item of cartItems.products) {
       //   if (item.product.quantity === 0) {
       //     res.render('')
@@ -36,14 +35,10 @@ exports.checkoutpage = asynchandler(async (req, res) => {
         expiryDate: { $gt: Date.now() },
       })
         .select({ code: 1, _id: 0 })
-        // .limit(2);
-        // console.log(availablecoupon);
   
       let couponmessages = {};
       const coupons = availablecoupon.map((coupon) => coupon.code).join(" | ");
-      // console.log(coupons);
       couponmessages = { status: "text-info", message: "Try " + coupons };
-      // console.log(couponmessages,"::::::::::::::::::::::::::::coupon smsges::::::::::::::::");
   
       if (cartItems) {
         const { subtotal, total, discount} =
@@ -77,36 +72,32 @@ exports.checkoutpage = asynchandler(async (req, res) => {
 
   exports.placeOrder = asynchandler(async (req, res) => {
     try {
-      // console.log("inside place order");
+
       const userId = req.user._id;
-      const { addressId, payment_method, code} = req.body;
-      // console.log(addressId);
-      // console.log(payment_method);
-      // console.log(code+"gvgvguvuv");
-      // console.log(payment_method);
+      const { addressId, payment_method, code, isWallet} = req.body;
+
       
 
       const coupon = await Coupon.find({
         code: code,
         expiryDate: { $gt: Date.now() },
       });
-  // console.log("placeordr:::::::::::"+coupon);
+      console.log(coupon,"coupon");
   const cartItems = await checkoutHelper.getCartItems(userId);
-  // console.log(cartItems);
   let items = cartItems.products;
-  // console.log(items);
 for (const item of cartItems.products) {
   if (item.product.quantity === 0) {
     return res.status(201).json({ message: "out of stock" });
   }
 }
 
-// console.log("stock checks end here::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::");
+
       const newOrder = await checkoutHelper.placeOrder(
         userId,
         addressId,
         payment_method,
         code,
+        isWallet,
         coupon
       );
 
@@ -119,14 +110,29 @@ for (const item of cartItems.products) {
         });
       } else if (payment_method === "online_payment") {
         const user = await User.findById(req.user._id);
+        const wallet = await Wallet.find({ user: userId });
         
         let totalAmount = 0;
         
 
-        totalAmount = newOrder.totalPrice;
-        newOrder.paidAmount = totalAmount;
+        if (isWallet) {
+          totalAmount = newOrder.totalPrice;
+          totalAmount = totalAmount - wallet.balance;
+          newOrder.paidAmount = totalAmount;
+          newOrder.wallet = wallet.balance;
+          await newOrder.save();
+  
+          const walletTransaction = await WalletTransaction.create({
+            wallet: wallet._id,
+            amount: wallet.balance,
+            type: "debit",
+          });
         
-        await newOrder.save();
+        } else {
+          totalAmount = newOrder.totalPrice;
+          newOrder.paidAmount = totalAmount;
+          await newOrder.save();
+        }
 
         var instance = new Razorpay({
           key_id: process.env.RAZORPAY_ID_KEY,
@@ -158,7 +164,25 @@ for (const item of cartItems.products) {
         );
        
       
-       } else {
+       }  else if (payment_method === "wallet_payment") {
+        const wallet = await Wallet.findOne({ user: userId });
+        wallet.balance -= newOrder.wallet;
+        await wallet.save();
+        newOrder.wallet = newOrder.totalPrice;
+        await newOrder.save();
+  
+        const wallettransaction = await WalletTransaction.create({
+          wallet: wallet._id,
+          amount: newOrder.totalPrice,
+          type: "debit",
+        });
+  
+        res.status(200).json({
+          message: "Order placed successfully",
+          orderId: newOrder._id,
+      });
+      }
+        else {
         res.status(400).json({ message: "Invalid payment method" });
       }
 
@@ -184,10 +208,10 @@ for (const item of cartItems.products) {
   //GET Method
   exports.orderPlaced = asynchandler(async (req, res) => {
     try {
-      // console.log("::::::::::::::::::::::::::::::::::::::::::::::::::::::");
+      
       const orderId = req.params.id;
       const userId = req.user._id;
-      // console.log(userId+"userid       .....");
+      
       
       const order = await Order.findById(orderId).populate({
         path: "orderItems",
@@ -198,11 +222,8 @@ for (const item of cartItems.products) {
       
       
       const code = req.query.code
-      // console.log(code,"code for razpay and cod");
-      // const coupon = await Coupon.findOne({code:code}) || null;
       const coupon = await Coupon.findOne({code:order?.coupon?.code}) || null;
-      // console.log(coupon ,"coupon razpay and cod");
-      // console.log(coupon,"is teh coupon checkoutcontroller");
+
       const cartItems = await checkoutHelper.getCartItems(req.user._id);
   
       if (order.payment_method === "cash_on_delivery") {
@@ -211,7 +232,6 @@ for (const item of cartItems.products) {
           await item.save();
         }
         if (coupon) {
-          // console.log("jnjinojnoknojnojno");
           coupon.usedBy.push(userId);
           await coupon.save();
         }
@@ -222,12 +242,34 @@ for (const item of cartItems.products) {
         }
 
         if (coupon) {
-          // console.log("jnjinojnoknojnojno online pay");
+          
           coupon.usedBy.push(userId);
           await coupon.save();
         }
 
+        if (coupon) {
+          coupon.usedBy.push(userId);
+          await coupon.save();
+        }
+        const wallet = await Wallet.findOne({ user: userId });
+        wallet.balance -= order.wallet;
+        await wallet.save();
+      } else if (order.payment_method === "wallet_payment") {
+        for (const item of order.orderItems) {
+          item.isPaid = "paid";
+          await item.save();
+        }
+        
+        if (coupon) {
+          coupon.usedBy.push(userId);
+          await coupon.save();
+        }
+        const wallet = await Wallet.findOne({ user: userId });
+        wallet.balance -= order.totalPrice;
+        await wallet.save();
       }
+
+      
   
       if (cartItems) {
         for (const cartItem of cartItems.products) {
@@ -268,24 +310,30 @@ for (const item of cartItems.products) {
           subtotal,
           total,
           discount,
+          usedFromWallet,
+          walletBalance,
         } = await checkoutHelper.calculateTotalPrice(
           cartItems,
           userid,
+          req.body.payWithWallet,
           coupon
         );
         res.json({
           total,
           subtotal,
+          usedFromWallet,
+          walletBalance,
           discount,
         });
       } else {
-        const { subtotal, total, discount } =
+        const { subtotal, total, usedFromWallet, walletBalance, discount } =
           await checkoutHelper.calculateTotalPrice(
             cartItems,
             userid,
+            req.body.payWithWallet,
             coupon
           );
-        res.json({ total, subtotal, discount });
+        res.json({ total, subtotal, usedFromWallet, walletBalance, discount });
       }
     } catch (error) {
       throw new Error(error);
@@ -332,7 +380,7 @@ exports.updateCoupon = asynchandler(async (req, res) => {
       expiryDate: { $gt: Date.now() },
     });
     // const coupon = null
-    // console.log("coupon is "+coupon);
+    
 
     const cartItems = await checkoutHelper.getCartItems(userid);
     const availableCoupons = await Coupon.find({
@@ -342,7 +390,7 @@ exports.updateCoupon = asynchandler(async (req, res) => {
     .select({ code: 1, _id: 0 })
     
 
-  // console.log("available coupons is "+availableCoupons);
+  
     const { subtotal, total, discount } =
       await checkoutHelper.calculateTotalPrice(cartItems, userid, coupon, false);
 
@@ -352,7 +400,7 @@ exports.updateCoupon = asynchandler(async (req, res) => {
       //   expiryDate: { $gt: Date.now() },
       //   usedBy: { $nin: [userid] },
       // })
-      // console.log("coupons is "+ coupons);
+
       res.status(202).json({
         status: "info",
         message: "Tr" + coupons,

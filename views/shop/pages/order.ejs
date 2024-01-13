@@ -27,7 +27,6 @@
                                 <th>Product</th>
                                 <th>Price</th>
                                 <th>Quantity</th>
-                                <th>Payment method</th>
                                 <th>Status</th>
                                 <th>Actions</th>
                             </tr>
@@ -48,7 +47,6 @@
                                         </td>
                                         <td><%= orderItem.product.salePrice %></td>
                                         <td><%= orderItem.quantity %></td>
-                                        <td><%= orderItem.payment_method %></td>
                                         <td><%= orderItem.status %></td>
                                         <td>
                                             <a href="/orders/<%= orderItem._id %>" class="btn btn-info btn-sm">View Details</a>
@@ -64,4 +62,6 @@
             <% } %>
         </div>
     </div>
+     <a href="/userprofile" class="btn btn-dark btn-sm mt-3">Go Back</a>
 </div>
+

@@ -67,13 +67,20 @@
                     </div>
                     <div >
                         <div class="">
-                          <span class="h3 fw-bold">₹ <%= product.salePrice %></span>
+                            <% const savedPercentage = Math.round(((product.productPrice - product.salePrice) / product.productPrice) * 100); %>
+                            <% if (savedPercentage > 0) { %>
+                                <span style="color: green; margin-left: 5px;">
+                                    (Save <%= savedPercentage %> %)
+                                </span>
+                            <% } %>
+                            <span class="text-decoration-line-through text-secondary">₹ <%= product.productPrice %></span>
                         </div>
-                        <div class="">
-                          <span class="text-muted text-decoration-line-through"
-                            >₹ <%= product.productPrice %></span
-                          >
-                        </div>
+                        <span class="card-text h4">₹ <%= product.salePrice %></span>
+
+
+                        
+
+
                     <p><%= product.description %></p>
                     <% if (product.quantity === 0) { %>
                       <smal class="text-danger h4">Out Of Stock!</smal>
@@ -149,49 +156,51 @@
 
 
 <script>
-  function addToCart(id) {
-      const productId = id;
-      const url = `/cart/add/${productId}`;
-      const cartCount = document.getElementById("cartCount");
-      const cartMessage = document.getElementById("cart-message");
+    function addToCart(id) {
+        const productId = id;
+        const url = `/cart/add/${productId}`;
+        const cartCount = document.getElementById("cartCount");
+        const cartMessage = document.getElementById("cart-message");
 
-      fetch(url, {
-          method: "GET",
-      })
-          .then((response) => {
-              if (response.ok) {
-                  return response.json(); // Assuming server sends JSON
-              } else {
-                  console.error("Failed");
-              }
-          })
-          .then((data) => {
-              if (data) {
-                  console.log(data["message"]);
+        fetch(url, {
+            method: "GET",
+        })
+            .then((response) => {
+                if (response.ok) {
+                    // return response.json(); // Assuming server sends JSON
+                    window.location.reload();
+                } else {
+                    console.error("Failed");
+                }
+            })
+            .then((data) => {
+                if (data) {
+                    console.log(data["message"]);
 
-                  // Check if 'count' and 'message' properties exist in data
-                  if (data.count && data.message) {
-                      cartCount.innerText = data.count;
-                      cartMessage.innerText = data.message;
+                    // Check if 'count' and 'message' properties exist in data
+                    if (data.count && data.message) {
+                        cartCount.innerText = data.count;
+                        cartMessage.innerText = data.message;
 
-                      cartMessage.className = `position-fixed bg-${data.status} text-white p-2 rounded`;
-                      cartMessage.style.display = "block";
+                        cartMessage.className = `position-fixed bg-${data.status} text-white p-2 rounded`;
+                        cartMessage.style.display = "block";
+                        setTimeout(function () {
+                            cartMessage.style.display = "none";
+                        }, 1000);
 
-                      setTimeout(function () {
-                          cartMessage.style.display = "none";
-                      }, 3000);
-                  } else {
-                      console.error("Unexpected data format");
-                  }
-              }
-          })
-          .catch((error) => {
-              console.error("An error occurred:", error);
-          });
-  }
+
+
+                    } else {
+                        console.error("Unexpected data format");
+                    }
+                }
+            })
+            .catch((error) => {
+                console.error("An error occurred:", error);
+            });
+    }
 
 </script>
-
 <script>
     function toggleWishlist(id) {
     const productId = id;

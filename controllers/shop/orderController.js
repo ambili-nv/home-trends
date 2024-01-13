@@ -1,5 +1,8 @@
 const asynchandler = require("express-async-handler");
 const orderhelper = require("../../helper/orderhelper");
+const pdfMake = require("pdfmake/build/pdfmake");
+const vfsFonts = require("pdfmake/build/vfs_fonts");
+
 
 
 
@@ -79,7 +82,8 @@ exports.cancelSingleOrder = asynchandler(async(req,res)=>{
 exports.returnOrder = asynchandler(async(req,res)=>{
     try {
         const returnOrderItemId = req.params.id;
-        const result = await orderhelper.returnOrder(returnOrderItemId);
+
+        const result = await orderhelper.returnOrder(returnOrderItemId,req.user._id);
 
         if(result === "redirectBack"){
             res.redirect("back");
@@ -87,6 +91,28 @@ exports.returnOrder = asynchandler(async(req,res)=>{
         }else{
             res.json(result);
         }
+    } catch (error) {
+        throw new Error(error);
+    }
+});
+
+
+
+exports.donwloadInvoice = asynchandler(async(req,res)=>{
+    try {
+        const orderId = req.params.id;
+
+        const data = await orderhelper.generateInvoice(orderId);
+        pdfMake.vfs = vfsFonts.pdfMake.vfs;
+
+        const pdfDoc = pdfMake.createPdf(data);
+
+        pdfDoc.getBuffer((buffer)=>{
+            res.setHeader("Content-Type","application/pdf");
+            res.setHeader("Content-Disposition", `attachment; filename=invoices.pdf`);
+
+            res.end(buffer);
+        });
     } catch (error) {
         throw new Error(error);
     }

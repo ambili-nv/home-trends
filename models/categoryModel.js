@@ -1,7 +1,4 @@
 const mongoose = require('mongoose');
-const Product = require("../models/productModel");
-const schedule = require("node-schedule");
-
 const categorySchema = new mongoose.Schema({
     title: {
         type: String,
@@ -30,58 +27,4 @@ const categorySchema = new mongoose.Schema({
 );
 
 
-
-categorySchema.pre("save", async function (next) {
-  try {
-    await updateProductPrices(this);
-    next();
-  } catch (error) {
-    console.error("Error in pre-save middleware:", error);
-    next(error);
-  }
-});
-
-const Category = mongoose.model("Category", categorySchema);
-
-
-
-async function updateProductPrices(category) {
-  console.log({ status: "Working" });
-  const products = await Product.find({ category: category._id });
-  const currentDate = new Date();
-  if (
-    category.offer &&
-    category.offer > 0 &&
-    category.startDate <= currentDate &&
-    currentDate <= category.endDate
-  ) {
-    for (const product of products) {
-      const newPrice =
-      product.productPrice - product.productPrice * (category.offer / 100);
-      product.salePrice = Math.round(newPrice);
-      await product.save();
-    
-    }
-  } else {
-    for (const product of products) {
-      product.salePrice = product.productPrice;
-      await product.save();
-    }
-  }
-}
-
-const dailyScheduleRule = new schedule.RecurrenceRule();
-dailyScheduleRule.hour = 0;
-dailyScheduleRule.minute = 0;
-
-schedule.scheduleJob(dailyScheduleRule, async () => {
-  const categories = await Category.find();
-
-  for (const category of categories) {
-    await updateProductPrices(category);
-  }
-});
-
-
-
-module.exports = Category;
+module.exports = mongoose.model("Category", categorySchema);

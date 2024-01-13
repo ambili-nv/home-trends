@@ -3,7 +3,8 @@
     .sidebar-categories .active {
         /* Define styles to highlight the active category */
         font-weight: bold;
-        color: black; /* Change the color as desired */
+        color: black;
+        /* Change the color as desired */
     }
 </style>
 
@@ -15,40 +16,34 @@
                 <div class="col-lg-3 order-2 order-lg-1">
                     <div class="shop-sidebar mr-50">
                         <div class="sidebar-widget mb-50">
-                            
+
                             <h3 class="sidebar-title">Search Products</h3>
                             <div class="sidebar-search">
                                 <form action="/shops">
-                                    <input placeholder="Search Products..." type="text" id="search" name="search" value="<%= search %>">
+                                    <input placeholder="Search Products..." type="text" id="search" name="search"
+                                        value="<%= search %>">
                                     <button><i class="ti-search"></i></button>
                                 </form>
                             </div>
                         </div>
-  
-
-                        
-
                         <div class="sidebar-widget mb-45">
                             <h3 class="sidebar-title">Categories</h3>
                             <div class="sidebar-categories">
                                 <ul>
-                                    <% categories.forEach(element => { %>
+                                    <% categories.forEach(element=> { %>
                                         <li>
                                             <a href="/shop?page=<%= currentPage - 1 %>&search=<%= search %>&category=<%= element._id %>"
                                                 class="<%= category === element._id.toString() ? 'active' : '' %>">
                                                 <%= element.title %>
                                             </a>
                                         </li>
-                                    <% }) %>
+                                        <% }) %>
                                 </ul>
                             </div>
                         </div>
-                        
+
                     </div>
                 </div>
-
-               
-                
                 <div class="col-lg-9 order-1 order-lg-2">
                     <div class="shop-product-wrapper res-xl res-xl-btn">
                         <div class="shop-bar-area">
@@ -58,163 +53,144 @@
                                         <label>Sort By : </label>
                                         <select name="sortBy" id="sortBySelect" data-current-page="<%= currentPage %>"
                                             data-category="<%= category %>">
-                                            <option <%= sortBy === "default" ? "selected" : "" %> value="default">Default</option>
-                                            <option <%= sortBy === "az" ? "selected" : "" %> value="az">A to Z</option>
-                                            <option <%= sortBy === "za" ? "selected" : "" %> value="za">Z to A</option>
-                                            <option <%= sortBy === "price-asc" ? "selected" : "" %> value="priceasc">price:Low to High</option>
-                                            <option <%= sortBy === "price-desc" ? "selected" : "" %> value="pricedesc">price:High to Low</option>
-                                          </select>
+                                            <option <%=sortBy==="default" ? "selected" : "" %> value="default">Default
+                                            </option>
+                                            <option <%=sortBy==="az" ? "selected" : "" %> value="az">A to Z</option>
+                                            <option <%=sortBy==="za" ? "selected" : "" %> value="za">Z to A</option>
+                                            <option <%=sortBy==="price-asc" ? "selected" : "" %>
+                                                value="priceasc">price:Low to High</option>
+                                            <option <%=sortBy==="price-desc" ? "selected" : "" %>
+                                                value="pricedesc">price:High to Low</option>
+                                        </select>
                                     </div>
                                 </div>
-
-                                
-
                             </div>
-                            
-
-                            
-
-                            <div class="shop-product-content tab-content">
-                                <div id="grid-sidebar1" class="tab-pane fade active show">
-                                    <div class="row">
-                                        <%- include('../partials/flash_msg') %>
-                                        <% products.forEach(product=> { %>
-                                            <div class="col-lg-6 col-md-6 col-xl-3">
-                                                <div class="product-wrapper mb-30">
-                                                    <div class="product-img">
-                                                        <a href="/product/<%= product._id %>">
-
-                                                            <img src="<%= product.images[0].thumbnailUrl %>"
-                                                                alt="<%= product.title %>" width="200px"
-                                                                height="310px" />
-                                                        </a>
 
 
-                                                        <div class="product-action">
+                            <%- include('../partials/flash_msg') %>
 
-                                                            <a  
-                                                            id="wishlistButton"
-                                                            class="animate-left"
-                                                            title="Wishlist"
-                                                            onclick="toggleWishlist('<%= product._id %>')">
-                                                                <i class="pe-7s-like"></i>
+                                <div class="shop-product-content tab-content">
+                                    <div id="grid-sidebar1" class="tab-pane fade active show">
+                                        <div class="row">
+
+                                            <% products.forEach(product=> { %>
+                                                <div class="col-lg-6 col-md-6 col-xl-3">
+                                                    <div class="product-wrapper mb-30">
+                                                        <div class="product-img">
+                                                            <a href="/product/<%= product._id %>">
+
+                                                                <img src="<%= product.images[0].thumbnailUrl %>"
+                                                                    alt="<%= product.title %>" width="200px"
+                                                                    height="310px" />
                                                             </a>
 
-                                                          
-                                                            <% if (product.quantity) { %>
-                                                                <a
-                                                                  class="animate-top"
-                                                                  title="Add To Cart"
-                                                                  onclick="addToCart(`<%= product._id %>`)"
-                                                                  
-                                                                >
-                                                                  <i class="pe-7s-cart"></i>
+
+                                                            <div class="product-action">
+
+                                                                <a id="wishlistButton" class="animate-left"
+                                                                    title="Wishlist"
+                                                                    onclick="toggleWishlist('<%= product._id %>')">
+                                                                    <i class="pe-7s-like"></i>
                                                                 </a>
-                                                                <% } %>
-
-                                                                    <!-- <a class="animate-right" title="Quick View"
-                                                                data-bs-toggle="modal" data-bs-target="#exampleModal"
-                                                                href="#">
-                                                                <i class="pe-7s-cart"></i>
-                                                            </a> -->
 
 
-
-                                                        </div>
-                                                    </div>
-
-
-
-                                                    <div class="product-content">
-                                                        <div class="d-flex justify-content-between">
-                                                            <medium class="card-title font-weight-bold"
-                                                                style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap">
-                                                                <%= product.title %>
-                                                                    <h6 class="small">
-                                                                        Category:<%=product.Category?.title %>
-                                                                        <!-- <%= product.description %> -->
-                                                                    </h6>
-                                                            </medium>
-                                                            <div>
-                                                                <% if (product.quantity ==0) { %>
-                                                                    <p class="text-danger">Out of Stock </p> 
-                                                              <%  } %>
+                                                                <% if (product.quantity) { %>
+                                                                    <a class="animate-top" title="Add To Cart"
+                                                                        onclick="addToCart(`<%= product._id %>`)">
+                                                                        <i class="pe-7s-cart"></i>
+                                                                    </a>
+                                                                    <% } %>
                                                             </div>
                                                         </div>
-                                                       
+                                                        <div class="product-content">
+                                                            <div class="d-flex justify-content-between">
+                                                                <medium class="card-title font-weight-bold"
+                                                                    style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap">
+                                                                    <%= product.title %>
+                                                                        <h6 class="small">
+                                                                            <!-- Category:<%=product.Category?.title %> -->
+                                                                            <%= product.description %>
+                                                                        </h6>
+                                                                </medium>
+                                                                <div>
+                                                                    <% if (product.quantity==0) { %>
+                                                                        <p class="text-danger">Out of Stock </p>
+                                                                        <% } %>
+                                                                </div>
+                                                            </div>
+                                                            <div class="d-flex justify-content-between">
+
+                                                                <!-- Assuming this code is inside a loop for each product -->
+                                                                <div class="">
+                                                                    <% const
+                                                                        savedPercentage=Math.round(((product.productPrice
+                                                                        - product.salePrice) / product.productPrice) *
+                                                                        100); %>
+                                                                        <% if (savedPercentage> 0) { %>
+                                                                            <span
+                                                                                style="color: green; margin-left: 5px;">
+                                                                                (Save <%= savedPercentage %> %)
+                                                                            </span>
+                                                                            <% } %>
+                                                                                <span
+                                                                                    class="text-decoration-line-through text-secondary">₹
+                                                                                    <%= product.productPrice %>
+                                                                                </span>
+                                                                </div>
+                                                                <span class="card-text h4">₹ <%= product.salePrice %>
+                                                                </span>
+                                                            </div>
 
 
-                                                        <div class="d-flex justify-content-between">
-                                                            <% if (product.salePrice !== product.productPrice) { %>
-                                                                    <div class="">
-                                                                        <span class="text-decoration-line-through text-secondary">₹ <%= product.productPrice %></span>
-                                                                        <span class="text-success" ><%= product.category.offer %>% Off</span>
-                                                                    </div>
-                                                            <% } %>
-                                                            <span class="card-text h4">₹ <%= product.salePrice %></span>
                                                         </div>
-
-
                                                     </div>
                                                 </div>
-                                            </div>
-                                            <% }) %>
+                                                <% }) %>
+                                        </div>
+                                    </div>
+                                    <div class="pagination-style mt-30 text-center">
+                                        <ul>
+                                            <% if (currentPage> 1) { %>
+                                                <li>
+                                                    <a href="/shop?page=<%= currentPage - 1 %>">
+                                                        <i class="ti ti-arrow-left"></i>
+                                                        <!-- Font Awesome icon for "Previous" -->
+                                                    </a>
+                                                </li>
+                                                <% } %>
+                                                    <% for (let i=1; i <=Math.ceil(totalProductsCount / itemsPerPage);
+                                                        i++) { %>
+                                                        <li class="<%= currentPage === i ? 'active' : '' %>">
+                                                            <a href="/shop?page=<%= i %>">
+                                                                <%= i %>
+                                                            </a>
+                                                        </li>
+                                                        <% } %>
+                                                            <% if (currentPage < Math.ceil(totalProductsCount /
+                                                                itemsPerPage)) { %>
+                                                                <li>
+                                                                    <a href="/shop?page=<%= currentPage + 1 %>">
+                                                                        <i class="ti ti-arrow-right"></i>
+                                                                        <!-- Font Awesome icon for "Next" -->
+                                                                    </a>
+                                                                </li>
+                                                                <% } %>
+                                        </ul>
                                     </div>
                                 </div>
-
-
-
-                                <div class="pagination-style mt-30 text-center">
-                                    <ul>
-                                      <% if (currentPage > 1) { %>
-                                      <li>
-                                        <a
-                                          href="/shop?page=<%= currentPage - 1 %>"
-                                        >
-                                          <i class="ti ti-arrow-left"></i>
-                                          <!-- Font Awesome icon for "Previous" -->
-                                        </a>
-                                      </li>
-                                      <% } %> <% for (let i = 1; i <= Math.ceil(totalProductsCount /
-                                      itemsPerPage); i++) { %>
-                                      <li class="<%= currentPage === i ? 'active' : '' %>">
-                                        <a
-                                          href="/shop?page=<%= i %>"
-                                          ><%= i %></a
-                                        >
-                                      </li>
-                                      <% } %> <% if (currentPage < Math.ceil(totalProductsCount /
-                                      itemsPerPage)) { %>
-                                      <li>
-                                        <a
-                                          href="/shop?page=<%= currentPage + 1 %>"
-                                        >
-                                          <i class="ti ti-arrow-right"></i>
-                                          <!-- Font Awesome icon for "Next" -->
-                                        </a>
-                                      </li>
-                                      <% } %>
-                                    </ul>
-                                  </div>
-
-
-                            
-                            </div>
                         </div>
                     </div>
                 </div>
-
-
 
                 <script>
                     const sortBySelect = document.getElementById("sortBySelect");
                     const currentPage = sortBySelect.getAttribute("data-current-page");
                     const category = sortBySelect.getAttribute("data-category");
                     const search = document.getElementById("search").value;
-                  
+
                     sortBySelect.addEventListener("change", function () {
                         const selectedValue = this.value;
-                  
+
                         // Define a mapping of sort options to URLs
                         const sortOptionsToUrls = {
                             default: "/shop/",
@@ -223,16 +199,16 @@
                             priceasc: `/shop/?page=${currentPage - 1}&search=${search}&category=${category}&sortBy=price-asc`,
                             pricedesc: `/shop/?page=${currentPage - 1}&search=${search}&category=${category}&sortBy=price-desc`,
                         };
-                  
+
                         // Get the corresponding URL for the selected sorting option
                         const url = sortOptionsToUrls[selectedValue];
-                  
+
                         if (url) {
                             // Redirect to the selected URL
                             window.location.href = url;
                         }
                     });
-                  </script>
+                </script>
 
 
                 <script>
@@ -247,7 +223,8 @@
                         })
                             .then((response) => {
                                 if (response.ok) {
-                                    return response.json(); // Assuming server sends JSON
+                                    // return response.json(); // Assuming server sends JSON
+                                    window.location.reload();
                                 } else {
                                     console.error("Failed");
                                 }
@@ -267,7 +244,7 @@
                                             cartMessage.style.display = "none";
                                         }, 1000);
 
-                                      
+
 
                                     } else {
                                         console.error("Unexpected data format");
@@ -283,43 +260,43 @@
 
 
 
-<script>
-    function toggleWishlist(id) {
-    const productId = id;
-    const url = `/wishlist/toggle/${productId}`;
-    const wishlistButton = document.getElementById(productId);
-    const cartMessage = document.getElementById("wishlist-message");
-  
-    fetch(url, {
-        method: "GET",
-    })
-        .then((response) => {
-            if (response.ok) {
-                return response.json(); 
-            } else {
-                console.error("Failed");
-            }
-        })
-        .then((data) => {
-            if (data) {
-              if (data.isInWishlist) {
-                wishlistButton.classList.add("text-danger")
-              } else {
-                wishlistButton.classList.remove("text-danger")
-              }
-                const iconClass = data.isInWishlist ? "text-danger" : "";
-                cartMessage.innerHTML = data.message;
-                cartMessage.className = `position-fixed bg-${data.status} text-white p-2 rounded`;
-                cartMessage.style.display = "block";
-                setTimeout(function () {
-                    cartMessage.style.display = "none";
-                }, 3000);
-            } else {
-                console.error("Unexpected data format");
-            }
-        })
-        .catch((error) => {
-            console.error("An error occurred:", error);
-        });
-  }
-  </script>
+                <script>
+                    function toggleWishlist(id) {
+                        const productId = id;
+                        const url = `/wishlist/toggle/${productId}`;
+                        const wishlistButton = document.getElementById(productId);
+                        const cartMessage = document.getElementById("wishlist-message");
+
+                        fetch(url, {
+                            method: "GET",
+                        })
+                            .then((response) => {
+                                if (response.ok) {
+                                    return response.json();
+                                } else {
+                                    console.error("Failed");
+                                }
+                            })
+                            .then((data) => {
+                                if (data) {
+                                    if (data.isInWishlist) {
+                                        wishlistButton.classList.add("text-danger")
+                                    } else {
+                                        wishlistButton.classList.remove("text-danger")
+                                    }
+                                    const iconClass = data.isInWishlist ? "text-danger" : "";
+                                    cartMessage.innerHTML = data.message;
+                                    cartMessage.className = `position-fixed bg-${data.status} text-white p-2 rounded`;
+                                    cartMessage.style.display = "block";
+                                    setTimeout(function () {
+                                        cartMessage.style.display = "none";
+                                    }, 3000);
+                                } else {
+                                    console.error("Unexpected data format");
+                                }
+                            })
+                            .catch((error) => {
+                                console.error("An error occurred:", error);
+                            });
+                    }
+                </script>

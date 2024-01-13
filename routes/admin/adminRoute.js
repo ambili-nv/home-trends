@@ -88,9 +88,12 @@ router.post("/editcoupon/:id",couponController.updateCoupon);
 router.delete("/deletecoupon/:id",couponController.deleteCoupon);
 
 
-//Offers
-// router.get("/categoryoffers",adminController.offerPage)
-// router.post('/categoryOffer',adminController.categoryOffer);
+//salesreport
+router.get("/sales-report", adminController.salesReportpage);
+router.get("/get/sales-report", adminController.generateSalesReport);
+router.get("/sales-data", adminController.getSalesData);
+router.get("/sales-data/yearly", adminController.getSalesDataYearly);
+router.get("/sales-data/weekly", adminController.getSalesDataWeekly);
 
 
 module.exports=router;

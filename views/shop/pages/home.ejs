@@ -18,7 +18,7 @@
                                 <h2 class="animated">Comfort <br>Collection.</h2>
                                 <p class="animated">Lorem Ipsum is simply dummy text of the printing and typesetting
                                     industry.</p>
-                                <a class="furniture-slider-btn btn-hover animated" href="product-details.html">Shop Now</a>
+                                
                             </div>
                         </div>
                     </div>
@@ -28,78 +28,7 @@
     </div>
 
 
-    <!-- product area start -->
-    <!-- <div class="popular-product-area wrapper-padding-3 pt-115 pb-115">
-        <div class="container-fluid">
-            <div class="section-title-6 text-center mb-50">
-                <h2>Popular Product</h2>
-            </div>
 
-            <div class="product-style">
-                <div class="popular-product-active owl-carousel">
-
-                    <% products.forEach(product=> { %>
-
-                        <div class="product-wrapper">
-                            <div class="product-img">
-                                <a href="/product/<%= product?._id %>">
-                                    <img src="<%= product?.images[0]?.thumbnailUrl %>"
-                                        style="width: 300px; height: 400px;" class="img-fluid" alt="">
-                                </a>
-
-                                <div class="product-action">
-                                    <a class="animate-left" title="Wishlist" href="#">
-                                        <i class="pe-7s-like"></i>
-                                    </a>
-                                    <a class="animate-top" title="Add To Cart" href="#">
-                                        <i class="pe-7s-cart"></i>
-                                    </a>
-                                    <!-- <a class="animate-right" title="Quick View" data-bs-toggle="modal" data-bs-target="#exampleModal" href="#">
-                                <i class="pe-7s-look"></i>
-                            </a> -->
-                                <!-- </div>
-
-
-                            </div>
-                            <div class="funiture-product-content text-center">
-                                <h4><a href="#">
-                                        <%= product?.title %>
-                                    </a></h4>
-                                <h6>
-                                    <%= product?.category?.title %>
-                                </h6>>
-                            </div>
-                        </div>
-                </div>
-                <% }) %>
-            </div>
-        </div>
-    </div> -->
-    <!-- product area end -->
-
-
-    <!-- discount area start -->
-    <!-- <div class="discount-area pt-70 pb-120">
-    <div class="container">
-        <div class="row">
-            <div class="ms-auto col-lg-7">
-                <div class="discount-img pl-70">
-                    <img src="shop/assets/img/banner/28.jpg" alt="">
-                </div>
-            </div>
-            <div class="col-lg-5">
-                <div class="discount-details-wrapper">
-                    <h5>Verified quality</h5>
-                    <p>Lorem Ipsum is simply dummy text of the printing and typesetting industry.</p>
-                    <h2>Summer Discount <br>Up to 30%</h2>
-                    <p class="discount-peragraph">It is a long established fact that a reader will be distracted by the readable content of a page when looking at its layout.</p>
-                    <a class="discount-btn btn-hover" href="product-details.html">Buy Now</a>
-                </div>
-            </div>
-        </div>
-    </div>
-</div> -->
-    <!-- discount area end -->
 
 
 
@@ -117,21 +46,8 @@
     </div>
     <!-- premium area end -->
 
-
-
-   
-
-
-
-
-
-
     <div class="product-wrapper mb-30 p-3"> <!-- Added 'p-3' for padding -->
         <!-- Existing product content -->
-   
-    
-
-
 
     <div class="shop-product-content tab-content  mt-5" style="display: flex;">
         <div id="grid-sidebar1" class="tab-pane fade active show">
@@ -164,21 +80,8 @@
                                             <i class="pe-7s-cart"></i>
                                         </a>
                                         <% } %>
-
-
-                                    <!-- <a class="animate-right" title="Quick View"
-                                        data-bs-toggle="modal" data-bs-target="#exampleModal"
-                                        href="#">
-                                        <i class="pe-7s-look"></i>
-                                    </a> -->
-
-
-
                                 </div>
                             </div>
-
-
-
                             <div class="product-content">
                                 <div class="d-flex justify-content-between">
                                     <medium class="card-title font-weight-bold"
@@ -189,12 +92,23 @@
                                                 <%= product.description %>
                                             </h6>
                                     </medium>
+                                    <div>
+                                        <% if (product.quantity==0) { %>
+                                            <p class="text-danger">Out of Stock </p>
+                                            <% } %>
+                                    </div>
                                 </div>
 
                                 <div class="d-flex justify-content-between">
-                                    <% if (product.productPrice !== product.salePrice) { %>
+                                    <div class="">
+                                        <% const savedPercentage = Math.round(((product.productPrice - product.salePrice) / product.productPrice) * 100); %>
+                                        <% if (savedPercentage > 0) { %>
+                                            <span style="color: green; margin-left: 5px;">
+                                                (Save <%= savedPercentage %> %)
+                                            </span>
+                                        <% } %>
                                         <span class="text-decoration-line-through text-secondary">₹ <%= product.productPrice %></span>
-                                    <% } %>
+                                    </div>
                                     <span class="card-text h4">₹ <%= product.salePrice %></span>
                                 </div>
                             </div>
@@ -203,19 +117,13 @@
                     <% }) %>
             </div>
         </div>
-
-        
-
     </div>
 </div>
 
     <div class="view-all-product text-center">
         <a href="/shops">View All Product</a>
     </div>
-
-
     <!-- product area end -->
-
 
     <!-- testimonials area start -->
     <div class="testimonials-area pt-120 pb-115">
@@ -234,8 +142,6 @@
         </div>
     </div>
     <!-- testimonials area end -->
-
-
 
     <!-- services area start -->
     <div class="services-area wrapper-padding-4 gray-bg pt-120 pb-80">
@@ -287,7 +193,8 @@
             })
                 .then((response) => {
                     if (response.ok) {
-                        return response.json(); // Assuming server sends JSON
+                        // return response.json(); // Assuming server sends JSON
+                        window.location.reload();
                     } else {
                         console.error("Failed");
                     }
@@ -303,10 +210,12 @@
 
                             cartMessage.className = `position-fixed bg-${data.status} text-white p-2 rounded`;
                             cartMessage.style.display = "block";
-
                             setTimeout(function () {
                                 cartMessage.style.display = "none";
-                            }, 3000);
+                            }, 1000);
+
+
+
                         } else {
                             console.error("Unexpected data format");
                         }

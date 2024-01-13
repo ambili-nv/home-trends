@@ -30,24 +30,6 @@
                                     <p class="text-danger" id="valueError"></p>
                                 </div>
 
-                                <div class="mb-4">
-                                    <label for="startDate" class="form-label">Start Date</label>
-                                    <input type="date" class="form-control" id="startDate" name="startDate" value="<%= (category && category.startDate) ? category.startDate.toISOString().split('T')[0] : '' %>"  placeholder="Enter start date">
-                                    <p class="text-danger" id="startdateError"></p>
-                                </div>
-
-                                <div class="mb-4">
-                                    <label for="endDate" class="form-label">End Date</label>
-                                    <input type="date" class="form-control" id="endDate" name="endDate"  value="<%= (category && category.endDate) ? category.endDate.toISOString().split('T')[0] : '' %>"  placeholder="Enter end date">
-                                    <p class="text-danger" id="enddateError"></p>
-                                </div>
-
-                                <div class="mb-4">
-                                    <label for="offerDescription" class="form-label">Offer Description</label>
-                                    <textarea class="form-control" id="offerDescription" name="offerDescription" placeholder="Enter offer description"><%= category.offerDescription %></textarea>
-                                    <p class="text-danger" id="descriptionError"></p>
-                                </div>
-
 
 
                             </div>
@@ -92,25 +74,19 @@ document.addEventListener("DOMContentLoaded", function () {
     submitForm.addEventListener("submit", function (e) {
         const categoryName = document.getElementById("CategoryName").value.trim();
         const offerPercentage = parseInt(document.getElementById("offer").value.trim());
-        const startDate = new Date(document.getElementById("startDate").value);
-        const endDate = new Date(document.getElementById("endDate").value);
-        const offerDescription = document.getElementById("offerDescription").value.trim();
+
 
         const nameError = categoryName === "" || /^\s+$/.test(categoryName) || /\d/.test(categoryName);
         const valueError = isNaN(offerPercentage) || offerPercentage < 0 || offerPercentage > 100;
-        const startDateError = isNaN(startDate.getTime()) || startDate <= new Date();
-        const endDateError = isNaN(endDate.getTime()) || endDate <= startDate || endDate <= new Date();
-        const descriptionError = offerDescription === "" || /^\s+$/.test(offerDescription);
+
 
         // Display error messages
         document.getElementById("nameError").textContent = nameError ? "Name should not be empty, contain only letters, and no spaces" : "";
-        document.getElementById("valueError").textContent = valueError ? "Offer percentage should be between 1 and 100" : "";
-        document.getElementById("startdateError").textContent = startDateError ? "Start date should be a future date" : "";
-        document.getElementById("enddateError").textContent = endDateError ? "End date should be a future date and greater than start date" : "";
-        document.getElementById("descriptionError").textContent = descriptionError ? "Offer description should not be empty" : "";
+        document.getElementById("valueError").textContent = valueError ? "Offer percentage should be between 0 and 100" : "";
+
 
         // Check for overall validity
-        const isValid = !(nameError || valueError || startDateError || endDateError || descriptionError);
+        const isValid = !(nameError || valueError );
 
         if (!isValid) {
             e.preventDefault(); // Prevent form submission if there are errors

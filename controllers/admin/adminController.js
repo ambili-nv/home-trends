@@ -8,6 +8,8 @@ const validateMongoDbId = require('../../utils/validateMongoDbId');
 const path = require("path");
 const sharp = require("sharp");
 const {roles} = require("../../utils/constants");
+const mongoose = require('mongoose');
+const numeral = require("numeral");
 // const { log } = require('console');
 
 
@@ -40,22 +42,67 @@ exports.homepage = asynchandler(async (req, res) => {
     }
 });
 
-exports.dashboard = asynchandler(async(req,res)=>{
-    const orders = await order.find().populate({
-        path:"orderItems",
-        populate:{
-            path:"product",
-            populate:{
-                path:"images",
-            }
-        }
-    })
+// exports.dashboard = asynchandler(async(req,res)=>{
+//     try {
+//     const user = req?.user;
+//     const orders = await order.find().limit(5).populate({
+//         path:"orderItems",
+//         populate:{
+//             path:"product",
+//             populate:{
+//                 path:"images",    
+//             }
+            
+//         },
+//         path:"user",
+//         select:"name",
+//     }).populate("orderItems").select("totalAmount orderDate totalPrice").sort({_id:-1});
+    
+//     let totalSalesAmount = 0;
+//     orders.forEach((order)=>{
+//         totalSalesAmount += order.totalPrice;
+//     });
+
+//     totalSalesAmount = numeral(totalSalesAmount).format("0.0a");
+
+//     const totalOrderCount = await order.countDocuments();
+//     const totalActiveUserCount = await User.countDocuments({ isBlocked: false });
+
+//         res.render('admin/pages/dashboard',{ title: "Dashboard",orders,user,totalSalesAmount,totalOrderCount,totalActiveUserCount })
+//     } catch (error) {
+//         throw new Error(error);
+//     }
+// });
+
+
+exports.dashboard = asynchandler(async (req, res) => {
     try {
-        res.render('admin/pages/dashboard',{ title: "Dashboard",orders })
+        const user = req?.user;
+        const recentOrders = await order.find().limit(5).populate({
+            path:"user",
+            select:"firstName lastname",
+        }).populate("orderItems").select("totalAmount orderDate totalPrice").sort({_id:-1});
+
+        let totalSalesAmount = 0;
+        recentOrders.forEach((order)=>{
+            totalSalesAmount += order.totalPrice;
+        });
+
+        totalSalesAmount = numeral(totalSalesAmount).format("0.0a");
+
+        
+
+        const totalOrderCount = await order.countDocuments();
+        const totalActiveUserCount = await User.countDocuments({ isBlocked: false });
+        res.render("admin/pages/dashboard", { title: "Dashboard",user,recentOrders,totalSalesAmount,totalOrderCount,totalActiveUserCount,});
     } catch (error) {
         throw new Error(error);
     }
-})
+});
+
+
+
+
 
 
 
@@ -168,12 +215,35 @@ exports.list = asynchandler(async (req, res) => {
 //Edit Category
 //PUT Method
 
+// exports.editcategory = asynchandler(async (req, res) => {
+//     const id = req.params.id;
+//     // console.log(id);
+//     validateMongoDbId(id);
+//     try {
+//         const {title, isListed, offer, offerDescription, startDate, endDate} = req.body;
+
+//         const editedCategory = await Category.findById(id);
+//         editedCategory.title = title;
+//         editedCategory.isListed = isListed;
+//         editedCategory.offer = offer;
+//         editedCategory.offerDescription = offerDescription;
+//         editedCategory.startDate = startDate;
+//         editedCategory.endDate = endDate;
+//         editedCategory.save();
+//         req.flash("success", `Category ${editedCategory.title} updated`);
+//         res.redirect("/admin/categories");
+//     } catch (error) {
+//         throw new Error(error);
+//     }
+// });
+
+
+
 exports.editcategory = asynchandler(async (req, res) => {
     const id = req.params.id;
-    // console.log(id);
     validateMongoDbId(id);
     try {
-        const {title, isListed, offer, offerDescription, startDate, endDate} = req.body;
+        const { title, isListed, offer, offerDescription, startDate, endDate } = req.body;
 
         const editedCategory = await Category.findById(id);
         editedCategory.title = title;
@@ -182,13 +252,42 @@ exports.editcategory = asynchandler(async (req, res) => {
         editedCategory.offerDescription = offerDescription;
         editedCategory.startDate = startDate;
         editedCategory.endDate = endDate;
-        editedCategory.save();
+        await editedCategory.save();
+        console.log(editedCategory);
+
         req.flash("success", `Category ${editedCategory.title} updated`);
         res.redirect("/admin/categories");
+
+        if (req.body.offer && parseFloat(req.body.offer) !== 0) {
+            
+            
+                const products = await Products.find({ category: editedCategory._id });
+
+                console.log("Category ID:", editedCategory._id);
+                console.log("Retrieved Products:", products);
+                console.log(products,"products");
+                for (const product of products) {
+                    const newPrice = product.productPrice - (product.productPrice * (parseFloat(offer) / 100));
+                    product.salePrice = Math.round(newPrice);
+                    await product.save();
+                }
+            
+        } else {
+            // No offer or offer is zero, reset product prices to their original values
+            
+            const products = await Products.findById({ category: editedCategory._id });
+            
+
+            for (const product of products) {
+                product.salePrice = product.productPrice;
+                await product.save();
+            }
+        }
     } catch (error) {
         throw new Error(error);
     }
 });
+
 
 //Delete Category
 //Delete method
@@ -325,18 +424,93 @@ exports.createproduct = asynchandler(async(req,res)=>{
 //EditProduct
 //PUT Method
 
+// exports.updateProduct = asynchandler(async (req, res) => {
+//     const id = req.params.id;
+//     validateMongoDbId(id);
+//     try {
+//         console.log(req.body);
+//       const editedProduct = await Products.findByIdAndUpdate(id, req.body);
+//       req.flash("success", `Product ${editedProduct.title} updated`);
+//       res.redirect("/admin/productlist");
+//     } catch (error) {
+//       throw new Error(error);
+//     }
+//   });
+
+// exports.updateProduct = asynchandler(async (req, res) => {
+//     const id = req.params.id;
+//     validateMongoDbId(id);
+//     try {
+//         const product = await Products.findById(id);
+
+//         if (req.body.offer && parseFloat(req.body.offer) !== 0) {
+//             const offer = parseFloat(req.body.offer);
+//             console.log(offer,"offerrrrrrrrrr");
+//             const newPrice = product.productPrice - (product.productPrice * (offer / 100));
+//             product.salePrice = Math.round(newPrice);
+//             const nw = await product.save();
+//             console.log(nw,"saved nw product in");
+//         } else {
+//             // If no offer, update the product using regular assignment
+//             Object.assign(product, req.body);
+            
+//         }
+
+//         const nw = await product.save();
+//         console.log(nw,"saved nw product");
+        
+
+//         if (req.body.offer && parseFloat(req.body.offer) === 0) {
+//             // Flash message when there's no offer and the product is updated
+//             req.flash("success", `Product ${product.title} updated`);
+//         } else {
+//             // Fetch the updated product after saving to get the editedProduct information
+//             const editedProduct = await Products.findById(id);
+//             req.flash("success", `Product ${editedProduct.title} updateds`);
+//         }
+//         await product.save();
+
+//         res.redirect("/admin/productlist");
+//     } catch (error) {
+//         throw new Error(error);
+//     }
+// });
+
 exports.updateProduct = asynchandler(async (req, res) => {
     const id = req.params.id;
     validateMongoDbId(id);
     try {
-        console.log(req.body);
-      const editedProduct = await Products.findByIdAndUpdate(id, req.body);
-      req.flash("success", `Product ${editedProduct.title} updated`);
-      res.redirect("/admin/productlist");
+        const product = await Products.findById(id);
+        const productOffer = parseFloat(product.offer);
+        const requestBodyOffer = parseFloat(req.body.offer);
+       
+if (productOffer !== requestBodyOffer) {
+            const offer = parseFloat(req.body.offer);
+            const newPrice = product.productPrice - (product.productPrice * (offer / 100));
+            product.salePrice = Math.round(newPrice);
+            product.offer = offer; 
+        } else {
+            Object.assign(product, req.body);
+        }
+
+        await product.save();
+
+        if (req.body.offer && parseFloat(req.body.offer) === 0) {
+            req.flash("success", `Product ${product.title} updateds`);
+        } else {            
+            const editedProduct = await Products.findById(id);
+            req.flash("success", `Product ${editedProduct.title} updated`);
+        }
+
+        res.redirect("/admin/productlist");
     } catch (error) {
-      throw new Error(error);
+        throw new Error(error);
     }
-  });
+});
+
+
+
+
 
 
 
@@ -509,53 +683,178 @@ exports.unblockCustomer = asynchandler(async (req, res) => {
     }
 });
 
+exports.salesReportpage = asynchandler(async (req, res) => {
+    try {
+        res.render("admin/pages/sales-report", { title: "Sales Report" });
+    } catch (error) {
+        throw new Error(error);
+    }
+});
 
-//Offers
-//OfferPage GET Method
-
-// exports.offerPage = asynchandler(async(req,res)=>{
+// exports.generateSalesReport = async (req, res, next) => {
 //     try {
-//         res.render("admin/pages/offers",{title:"Offer Page"})
+//         const fromDate = new Date(req.query.fromDate);
+//         const toDate = new Date(req.query.toDate);
+//         const salesData = await order.find({
+//             orderedDate: {
+//                 $gte: fromDate,
+//                 $lte: toDate,
+//             },
+//         }).select("orderId totalPrice orderedDate payment_method -_id");
+
+//         res.status(200).json(salesData);
 //     } catch (error) {
-//         throw new Error(error)
-//     }
-// })
-
-
-//category Offer
-//Method POST
-
-// exports.categoryOffer = asynchandler(async(req,res)=>{
-//     try {
-//         const { categoryId, offerPercentage } = req.body;
-//         console.log(categoryId,"categoryId");
-//         console.log(offerPercentage,"offerPercentage");
-//         const category = await Category.findById(categoryId);
-//         console.log(category,"category");
-//         if (category) {
-//           const products = await Products.find({ Category: categoryId });
-//           console.log(products,"products");
-//           for (const product of products) {   
-//             product.offerPercentage = offerPercentage;
-//             product.Price = product.salePrice - (product.salePrice * (product.offerPercentage / 100));
-//             console.log(product.Price,"product.Price");
-//             await product.save();
-//           }
-          
-    
-//           res.status(200).json({ success: true, message: 'Category offer applied successfully.' });
-//         } else {
-//           res.status(404).json({ success: false, message: 'Category not found.' });
-//         }
-//       } catch (error) {
 //         console.error(error);
-//         res.status(500).json({ success: false, message: 'An error occurred while applying the category offer.' });
-//       }
-// })
+//         next(error);
+//     }
+// };
+
+exports.generateSalesReport = async (req, res, next) => {
+    try {
+        const fromDate = new Date(req.query.fromDate);
+        const toDate = new Date(req.query.toDate);
+        // Adjust the toDate to include orders on the toDate as well
+        toDate.setDate(toDate.getDate() + 1);
+
+        const salesData = await order.find({
+            orderedDate: {
+                $gte: fromDate,
+                $lte: toDate,
+            },
+        }).select("orderId totalPrice orderedDate payment_method -_id");
+
+        res.status(200).json(salesData);
+    } catch (error) {
+        console.error(error);
+        next(error);
+    }
+};
 
 
 
+exports.getSalesData = async (req, res) => {
+    try {
+        const pipeline = [
+            {
+                $project: {
+                    year: { $year: "$orderedDate" },
+                    month: { $month: "$orderedDate" },
+                    totalPrice: 1,
+                },
+            },
+            {
+                $group: {
+                    _id: { year: "$year", month: "$month" },
+                    totalSales: { $sum: "$totalPrice" },
+                },
+            },
+            {
+                $project: {
+                    _id: 0,
+                    month: {
+                        $concat: [
+                            { $toString: "$_id.year" },
+                            "-",
+                            {
+                                $cond: {
+                                    if: { $lt: ["$_id.month", 10] },
+                                    then: { $concat: ["0", { $toString: "$_id.month" }] },
+                                    else: { $toString: "$_id.month" },
+                                },
+                            },
+                        ],
+                    },
+                    sales: "$totalSales",
+                },
+            },
+        ];
 
+        const monthlySalesArray = await order.aggregate(pipeline);
+       
+
+        res.json(monthlySalesArray);
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: "Internal Server Error" });
+    }
+};
+
+
+
+exports.getSalesDataYearly = async (req, res) => {
+    try {
+        const yearlyPipeline = [
+            {
+              $project: {
+                year: { $year: "$orderedDate" },
+                totalPrice: 1,
+              },
+            },
+            {
+              $group: {
+                _id: { year: "$year" },
+                totalSales: { $sum: "$totalPrice" },
+              },
+            },
+            {
+              $project: {
+                _id: 0,
+                year: { $toString: "$_id.year" },
+                sales: "$totalSales",
+              },
+            },
+          ];
+          
+
+        const yearlySalesArray = await order.aggregate(yearlyPipeline);
+        
+        res.json(yearlySalesArray);
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: "Internal Server Error" });
+    }
+};
+
+
+
+exports.getSalesDataWeekly =async (req, res) => {
+    try {
+        const weeklySalesPipeline = [
+            {
+              $project: {
+                week: { $week: "$orderedDate" },
+                totalPrice: 1,
+              },
+            },
+            {
+                $group: {
+                    _id: { week: { $mod: ["$week", 7] } },
+                    totalSales: { $sum: "$totalPrice" },
+                  },
+            },
+            {
+              $project: {
+                _id: 0,
+                week: { $toString: "$_id.week" },
+                dayOfWeek: { $add: ["$_id.week", 1] },
+                sales: "$totalSales",
+              },
+            },
+            {
+                $sort: { dayOfWeek: 1 },
+              },
+        ];
+          
+
+        const weeklySalesArray = await order.aggregate(weeklySalesPipeline);
+        console.log(weeklySalesArray);
+
+        res.json(weeklySalesArray);
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: "Internal Server Error" });
+    }
+};
 
 
 

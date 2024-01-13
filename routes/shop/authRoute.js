@@ -44,7 +44,7 @@ router.post('/register',
   .isLength({ min: 8 })
   .withMessage('Minimum 8 characters required')
   .matches(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]+$/)
-  .withMessage('Password must contain at least 1 uppercase, 1 lowercase, 1 digit, and 1 special character'),
+  .withMessage('Enter a Strong password'),
 
     body("confirm-password").custom((value, { req }) => {
         if (value !== req.body.password) {
@@ -60,5 +60,12 @@ authController.userRegister);
 
 
 router.put('/changepassword',authController.updatePassword);
+
+
+
+router.get("/forgot-password",authController.forgotPasswordpage);
+router.get("/reset-password/:token",authController.resetPasswordpage);
+router.post("/forgot-password", authController.forgotPassword);
+router.put("/reset-password/:token",authController.resetPassword);
 
 module.exports=router;

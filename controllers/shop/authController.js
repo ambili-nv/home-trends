@@ -255,12 +255,10 @@ exports.resendEmail = asynchandler(async (req, res) => {
                                   <p>Here is your one-time verification code:</p>
                                   <p style="font-size: 24px; font-weight: bold;">OTP Code: ${otp.otp_code}</p>
                                   <p>Please use this code within the next 60 second to confirm your email address. If you do not verify your email within this time frame, you will need to request a new OTP.</p>
-                                  <p>If you did not sign up for an account with Craftopia, please disregard this email.</p>
+                                  <p>If you did not sign up for an account with home_trends, please disregard this email.</p>
                               </td>
                           </tr>
                           <tr>
-                              <td style="text-align: center; padding: 30px;">
-                                  <p>Thank you for choosing Craftopia. We look forward to serving you!</p>
                               </td>
                           </tr>
                       </table>
@@ -360,60 +358,7 @@ exports.logoutUser = asynchandler(async (req, res, next) => {
 
 
 
-
-
-
-
-
-
-/////////////////////////////////////////////////
-//change password
-
-// exports. UpdatePassword = async (req, res) => {
-//   try {
-//       const { oldPassword, newPassword } = req.body;
-//       const userId = req.user.id;
-//       const user = await User.findById(userId);
-
-
-//       console.log('Provided Old Password:', oldPassword);
-
-//       // Compare the old password
-//       if (!oldPassword) {
-//           console.error('Old password not provided');
-//           return res.status(400).json({ error: 'Old password not provided' });
-//       }
-
-//       const isPasswordValid = await user.isPasswordMatched(oldPassword);
-
-//       if (!isPasswordValid) {
-//           return res.status(400).json({ error: 'Old password is incorrect' });
-//       }
-
-//       // Hash and update the new password
-//       try {
-//           const saltRounds = 10;
-//           const hashedNewPassword = await bcrypt.hash(newPassword, saltRounds);
-//           console.log(newPassword)
-//           user.password = hashedNewPassword;
-
-//       } catch (hashError) {
-//           console.error('Error hashing new password:', hashError);
-//           return res.status(500).json({ error: 'Error hashing new password' });
-//       }
-
-//       // Save the updated user
-//       await user.save();
-
-//       res.redirect('/login');
-//   } catch (error) {
-//       console.error(error);
-//       res.status(500).json({ error: 'Internal Server Error' });
-//     }
-// };
-
-
-
+//change Password
 
 exports.updatePassword = async (req, res) => {
   try {
@@ -441,10 +386,205 @@ exports.updatePassword = async (req, res) => {
    console.log(user.password,"userPassword");
     // Save the updated user
     await user.save();
-
+    req.flash("success",'Password changed Successfully')
     res.json({ message: 'Password updated successfully' });
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: 'Internal Server Error' });
   }
 };
+
+
+//forgot password
+//GET Method
+
+exports.forgotPasswordpage = asynchandler(async (req, res) => {
+  try {
+    const messages = req.flash();
+    res.render("shop/pages/forgot-password", {
+      title: "Forgot Password",
+      page: "forgot-password",
+      messages,
+    });
+  } catch (error) {
+    throw new Error(error);
+  }
+});
+
+//POST Method
+
+exports.forgotPassword = asynchandler(async (req, res) => {
+  try {
+    const email = req.body
+    console.log(email,"email::::::::::::::::");
+    const user = await User.findOne({ email: req.body.email });
+    console.log(user,"userrrrrrrrrrrrrrrr");
+
+    if (!user) {
+      req.flash("danger", "Email Not Found");
+      return res.redirect("/forgot-password");
+    }
+
+    const resetToken = await user.createResetPasswordToken();
+    await user.save();
+
+    const resetUrl = `${req.protocol}://${req.get(
+      "host"
+    )}/reset-password/${resetToken}`;
+    const html = `<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Password Reset</title>
+</head>
+<body style="font-family: Arial, sans-serif; background-color: #f4f4f4; margin: 0; padding: 0;">
+    <table border="0" cellpadding="0" cellspacing="0" width="100%">
+        <tr>
+            <td>
+                <table align="center" border="0" cellpadding="0" cellspacing="0" width="600" style="border-collapse: collapse;">
+                    <tr>
+                        <td align="center" bgcolor="#007bff" style="padding: 40px 0;">
+                            <h1 style="color: #ffffff;">Password Reset</h1>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td bgcolor="#ffffff" style="padding: 40px 30px;">
+                            <p>Dear ${user.name},</p>
+                            <p>We have received a request to reset your password. To reset your password, click the button below:</p>
+                            <p style="text-align: center;">
+                                <a href="${resetUrl}" style="display: inline-block; padding: 12px 24px; background-color: #007bff; color: #ffffff; text-decoration: none; border-radius: 5px; font-weight: bold;">Reset Password</a>
+                            </p>
+                            <p>If you didn't request a password reset, you can ignore this email. Your password will remain unchanged.</p>
+                            <p>Thank you for using our service!</p>
+                        </td>
+                    </tr>
+                    <tr>
+
+                    </tr>
+                </table>
+            </td>
+        </tr>
+    </table>
+</body>
+</html>
+`;
+
+    try {
+      sendEmail({
+        email: user.email,
+        subject: "Password Reset",
+        html: html,
+      });
+
+      req.flash("success", "Reset Link sent to your mail id");
+      return res.redirect("/forgot-password");
+    } catch (error) {
+      user.passwordResetToken = undefined;
+      user.passwordResetTokenExpires = undefined;
+      console.error(error);
+      req.flash(
+        "danger",
+        "There was an error sending the password reset email, please try again later"
+      );
+      return res.redirect("/forgot-password");
+    }
+  } catch (error) {
+    console.error(error);
+    req.flash("danger", "An error occurred, please try again later");
+    return res.redirect("/forgot-password");
+  }
+});
+
+
+//Reset Password
+//GET Method
+exports.resetPasswordpage = asynchandler(async (req, res) => {
+  try {
+    const token = crypto
+      .createHash("sha256")
+      .update(req.params.token)
+      .digest("hex");
+    const user = await User.findOne({
+      passwordResetToken: token,
+      passwordResetTokenExpires: { $gt: Date.now() },
+    });
+
+    if (!user) {
+      req.flash("warning", "Token is invalid or has expired");
+      res.redirect("/forgot-password");
+    }
+
+    res.render("shop/pages/reset-password", {
+      title: "Reset Password",
+      page: "Reset-password",
+      token,
+    });
+  } catch (error) {
+    throw new Error(error);
+  }
+});
+
+//PUT Method
+// exports.resetPassword = asynchandler(async (req, res) => {
+//   const token = req.params.token;
+//   try {
+//     const user = await User.findOne({
+//       passwordResetToken: token,
+//       passwordResetTokenExpires: { $gt: Date.now() },
+//     });
+
+//     if (!user) {
+//       req.flash("warning", "Token is invalid or has expired");
+//       res.redirect("/forgot-password");
+//     }
+
+//     user.password = req.body.password;
+//     const password = req.body.password
+//     console.log(password,"password::::::::::::::::::::::");
+//     user.passwordResetToken = null;
+//     user.passwordResetTokenExpires = null;
+//     user.passwordChangedAt = Date.now();
+
+//     await user.save();
+
+//     req.flash("success", "Password changed");
+//     res.redirect("/login");
+//   } catch (error) {
+//     throw new Error(error);
+//   }
+// });
+
+
+exports.resetPassword = asynchandler(async (req, res) => {
+  const token = req.params.token;
+  try {
+    const user = await User.findOne({
+      passwordResetToken: token,
+      passwordResetTokenExpires: { $gt: Date.now() },
+    });
+
+    if (!user) {
+      req.flash("warning", "Token is invalid or has expired");
+      res.redirect("/forgot-password");
+      return; // Add a return statement to exit the function if no user is found
+    }
+
+    // Hash the new password before saving it
+    const newPassword = req.body.password;
+    const salt = await bcrypt.genSalt(10);
+    const hashedPassword = await bcrypt.hash(newPassword, salt);
+
+    user.password = hashedPassword;
+    user.passwordResetToken = null;
+    user.passwordResetTokenExpires = null;
+    user.passwordChangedAt = Date.now();
+
+    await user.save();
+
+    req.flash("success", "Password changed");
+    res.redirect("/login");
+  } catch (error) {
+    throw new Error(error);
+  }
+});

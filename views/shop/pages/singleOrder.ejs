@@ -1,10 +1,11 @@
-<%- include('../partials/header') %>
+
 <style>
     .image{
         width: 150px;
         height: 150px;
     }
 </style>
+<%- include('../partials/header') %>
 <div class="container mt-5">
     <div class="card">
       <div class="card-header">
@@ -26,11 +27,7 @@
             </p>
             <p><strong>Price:</strong> ₹<%= (order.price * order.quantity) %></p>
 
-            <% const discount = orders.totalPrice - order.price; %>
-            <% if (discount !== 0) { %>
-                <p><strong>Discount:</strong> <%= discount %> </p>
-            <% } %>
-            <p><strong>Total Amount:</strong> <%= orders.totalPrice %></p>
+
             
             <p>
               <strong>Ordered Date:</strong> <%= new Date(orders.orderedDate).toUTCString() %>
@@ -69,6 +66,16 @@
               >
                 Return Order
               </button>
+
+              <button
+              type="button"
+              class="btn btn-info h-auto"
+              id="invoiceBtn"
+              data-invoice-id="<%= order._id %>"
+            >
+              Download Invoice
+            </button>
+
 
               <% }else if(order.status === "Return Requested" || order.status ===
           "Returned"){ %>
@@ -153,3 +160,45 @@
     </div>
   </div>
   
+
+
+  <script>
+    document.getElementById("invoiceBtn").addEventListener("click", function (orderId) {
+        var invoiceButton = this;
+        var invoiceId = this.getAttribute("data-invoice-id");
+  
+        // Disable the button and change its text
+        invoiceButton.disabled = true;
+        invoiceButton.textContent = "Downloading...";
+  
+        fetch(`/download/${invoiceId}`)
+            .then((response) => {
+                if (response.ok) {
+                    return response.blob();
+                } else {
+                    console.error("Failed to download the invoice");
+                }
+            })
+            .then((blob) => {
+                const url = window.URL.createObjectURL(blob);
+                const a = document.createElement("a");
+                a.href = url;
+                a.download = "invoice.pdf";
+                a.click();
+                window.URL.revokeObjectURL(url);
+  
+                // Re-enable the button and restore its original text
+                invoiceButton.disabled = false;
+                invoiceButton.textContent = "Download Invoice";
+            })
+            .catch((error) => {
+                // Handle errors here
+  
+                // Re-enable the button and restore its original text
+                invoiceButton.disabled = false;
+                invoiceButton.textContent = "Download Invoice";
+  
+                console.error("An error occurred:", error);
+            });
+    });
+  </script>

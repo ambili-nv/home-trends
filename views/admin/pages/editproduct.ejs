@@ -75,6 +75,27 @@
                             </div>
                         </div> 
                     </div> 
+
+                    <hr class="mb-4 mt-0">
+                    <div class="row">
+                        <div class="col-md-3">
+                            <h6>4. Offer</h6>
+                        </div>
+                        <div class="col-md-9">
+                            <div class="mb-4">
+                                <label for="offer" class="form-label">Offer Percentage</label>
+                                <input type="text" class="form-control" id="offer" name="offer" value="<%= product.offer %>" placeholder="Enter offer percentage">
+                                <p class="text-danger" id="valueError"></p>
+                            </div>
+
+
+
+
+
+                        </div> 
+                    </div> 
+
+
                     <div class="mb-4 mt-0"> 
                         <div>
                             <button type="submit" class="btn btn-primary mt-2" id="submit">Save Changes</button>
@@ -187,6 +208,103 @@
 
 
 
+<!-- 
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const editProductForm = document.getElementById("editproductform");
+        const submitButton = document.getElementById("submit");
+        const nameInput = document.getElementById("productName");
+        const nameError = document.getElementById("nameError");
+        const productPriceInput = document.getElementById("productPrice");
+        const productPriceError = document.getElementById("productpriceError");
+        const salePriceInput = document.getElementById("salePrice");
+        const salePriceError = document.getElementById("salespriceError");
+        const quantityInput = document.getElementById("quantity");
+        const quantityError = document.getElementById("quantityError");
+
+        function validateForm() {
+            const nameValue = nameInput.value.trim();
+            const productPriceValue = parseFloat(productPriceInput.value);
+            const salePriceValue = parseFloat(salePriceInput.value);
+            const quantityValue = parseInt(quantityInput.value);
+            const offerValue = parseInt(offerInput.value);
+
+            const startDateValue = new Date(startDateInput.value);
+            const endDateValue = new Date(endDateInput.value);
+
+
+
+        if (isNaN(offerValue) || offerValue < 1 || offerValue > 100) {
+            offerError.textContent = "Enter a valid offer percentage (1 - 100)";
+        } else {
+            offerError.textContent = "";
+        }
+
+        const currentDate = new Date();
+        if (startDateValue <= currentDate) {
+            startDateError.textContent = "Enter a future date";
+        } else {
+            startDateError.textContent = "";
+        }
+
+        if (endDateValue <= startDateValue) {
+            endDateError.textContent = "End date must be after the start date";
+        } else {
+            endDateError.textContent = "";
+        }
+
+
+
+            if (nameValue === "") {
+                nameError.textContent = "Product name is required";
+            } else {
+                nameError.textContent = "";
+            }
+
+            if (isNaN(productPriceValue) || productPriceValue <= 0) {
+                productPriceError.textContent = "Enter a valid product price";
+            } else {
+                productPriceError.textContent = "";
+            }
+
+            if (isNaN(salePriceValue) || salePriceValue <= 0) {
+                salePriceError.textContent = "Enter a valid sale price";
+            } else {
+                salePriceError.textContent = "";
+            }
+
+            if (isNaN(quantityValue) || quantityValue < 0) {
+                quantityError.textContent = "Enter a valid quantity";
+            } else {
+                quantityError.textContent = "";
+            }
+
+            const errors = [nameError.textContent, productPriceError.textContent, salePriceError.textContent, quantityError.textContent,offerError.textContent, startDateError.textContent, endDateError.textContent];
+            const hasError = errors.some((error) => error !== "");
+            submitButton.disabled = hasError;
+        }
+
+        function handleFormSubmit(event) {
+            validateForm();
+
+            if (submitButton.disabled) {
+                event.preventDefault();
+            }
+        }
+
+        nameInput.addEventListener("blur", validateForm);
+        productPriceInput.addEventListener("input", validateForm);
+        salePriceInput.addEventListener("input", validateForm);
+        quantityInput.addEventListener("input", validateForm);
+        offerInput.addEventListener("input", validateForm);
+        startDateInput.addEventListener("input", validateForm);
+        endDateInput.addEventListener("input", validateForm);
+
+        editProductForm.addEventListener("submit", handleFormSubmit);
+
+        validateForm();
+    });
+</script> -->
 
 <script>
     document.addEventListener("DOMContentLoaded", function () {
@@ -254,4 +372,3 @@
         validateForm();
     });
 </script>
-

@@ -1,18 +1,45 @@
 
-<style>
-.header-top-furniture.wrapper-padding-2.res-header-sm {
-    height: 100px; /* Set the desired height */
-}
-
-</style>
 
 
-<header>
-    <div class="header-top-furniture wrapper-padding-2 res-header-sm">
-        <div class="container-fluid">
-            <div class="header-bottom-wrapper row align-items-center justify-content-between">
-                <div class="col-md-8">
-                    <div class="menu-style-2 furniture-menu menu-hover">
+<header class="res-header-sm">
+    
+    <div class="header-top-wrapper" style="height: 100px;" >
+        <div class="container">
+            <div class="header-top">
+                <div class="logo-2 furniture-logo ptb-30">
+                    <a href="index.html">
+                        <img src="shop/assets/img/logo/2.png" alt="jhbjhbjb">
+                    </a>
+                </div>
+                <div class="book-login-register">
+                    <ul>
+                        <% if (user) { %>
+                            <li><a href="/wishlist" class="text-dark"><i class="ti-heart"></i>Wishlist</a></li>
+                            
+                            <li>
+                                <a class="icon-cart" href="/cart">
+                                    <i class="ti-shopping-cart"></i>
+                                    <span id="cartCount" class="handicraft-count text-dark"><%=cartCount %></span>
+                                </a>
+                            </li>
+                            <li><a href="/logout" class="text-dark"><i class="ti-user"></i>Logout</a></li>
+                         
+                        <% } else { %>
+                            <li><a href="/login" class="text-dark"><i class="ti-user"></i>login</a></li>
+                            <li><a href="/register" class="text-dark"><i class="ti-settings"></i>register</a></li>
+
+                            <% } %>
+                    </ul>
+
+                </div>
+            </div>
+        </div>
+    </div>
+                    <div class="header-bottom clearfix">
+                        <div class="container">
+                            <div class="header-bottom-wrapper" style="height: 50px;" >
+                                <div class="menu-style-2 book-menu menu-hover">
+                                    <div class="menu-style-2 book-menu menu-hover"></div>
                         <nav>
                             <ul class="horizontal-menu">
                                 <li><a href="/home">home</a></li>
@@ -28,8 +55,6 @@
                                             <li><a class="text-bg-dark-light" href="/address">Address</a></li> 
                                              <li><a class="text-bg-dark-light" href="/orders">Orders</a></li>
                                              <li><a class="text-bg-dark-light" href="/wallet">Wallet</a></li>
-                                             <li><a class="text-bg-dark-light" href="/wishlist">wishlist</a></li>
-                                             <li><a class="text-bg-dark-light" href="/logout">Logout</a></li> 
                                             </ul>
                                    <% }  %>
     
@@ -38,49 +63,41 @@
                             </ul>
                         </nav>
                     </div>
-                </div>
-                <div class="col-md-4 furniture-login text-end">
-                    <ul class="d-flex align-items-center justify-content-end">
+                    </div>
 
-                  
-
-                        
-                        <% if (!user) { %>
-                            <li><a href="/login">login</a></li>
-                            <li><a href="/register">Register</a></li>
-                        <% } %>
-                        
-
-                        <!-- Add your cart, profile, and wishlist icons here -->
-                        <li>   
-                             <% if(user){ %>
-
-                            <div class="header-cart-2">
-                                <a class="icon-cart" href="/cart">
-                                    <i class="ti-shopping-cart"></i>
-                                    <span id="cartCount" class="handicraft-count"><%=cartCount %></span>
-                                </a>
+                    <div class="row">
+                        <div class="mobile-menu-area d-md-block col-md-12 col-lg-12 col-12 d-lg-none d-xl-none">
+                            <div class="mobile-menu">
+                                <nav id="mobile-menu-active">
+                                    <ul class="horizontal-menu">
+                                        <li><a href="/home">home</a></li>
+                                        <li><a href="/shops">shop</a></li>
+                                        <li><a href="/about_us">About Us</a></li>
+                                        <li><a href="/contact">contact</a></li>
+                                       
+                                        <li>
+                                            <% if(user){%>
+                                                <a href="#">Account</a>
+                                                <ul class="single-dropdown">
+                                                    <li><a class="text-bg-dark-light" href="/userprofile">Profile</a></li> 
+                                                    <li><a class="text-bg-dark-light" href="/address">Address</a></li> 
+                                                     <li><a class="text-bg-dark-light" href="/orders">Orders</a></li>
+                                                     <li><a class="text-bg-dark-light" href="/wallet">Wallet</a></li> 
+                                                    </ul>
+                                           <% }  %>
+            
+                                        </li>
+            
+                                    </ul>
+                                </nav>
                             </div>
-        
-                        <% } %>
-                    </li>
-
-                       
-                        <!-- <li><a href="/userprofile"><i class="ti-user"></i></a></li> -->
-                        
-                        
-                      
-                        
-                    </ul>
+                        </div>
+                    </div>
                 </div>
             </div>
-        </div>
-    </div>
-    <div class="header-bottom-furniture wrapper-padding-2 border-top-3">
-        <div class="container-fluid"></div>
-    </div>
-</header>
+        </header>               
 
 
 
+  
 

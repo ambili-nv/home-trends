@@ -62,13 +62,14 @@
         const url = `/cart/add/${productId}`;
         const cartCount = document.getElementById("cartCount");
         const cartMessage = document.getElementById("cart-message");
-  
+
         fetch(url, {
             method: "GET",
         })
             .then((response) => {
                 if (response.ok) {
-                    return response.json(); // Assuming server sends JSON
+                    // return response.json(); // Assuming server sends JSON
+                    window.location.reload();
                 } else {
                     console.error("Failed");
                 }
@@ -76,18 +77,20 @@
             .then((data) => {
                 if (data) {
                     console.log(data["message"]);
-  
+
                     // Check if 'count' and 'message' properties exist in data
                     if (data.count && data.message) {
                         cartCount.innerText = data.count;
                         cartMessage.innerText = data.message;
-  
+
                         cartMessage.className = `position-fixed bg-${data.status} text-white p-2 rounded`;
                         cartMessage.style.display = "block";
-  
                         setTimeout(function () {
                             cartMessage.style.display = "none";
-                        }, 3000);
+                        }, 1000);
+
+
+
                     } else {
                         console.error("Unexpected data format");
                     }
@@ -97,5 +100,5 @@
                 console.error("An error occurred:", error);
             });
     }
-  
-  </script>
+
+</script>
