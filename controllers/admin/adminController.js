@@ -16,31 +16,57 @@ const numeral = require("numeral");
 
 
 
-exports.homepage = asynchandler(async (req, res) => {
-    const admin = req.user
+// exports.homepage = asynchandler(async (req, res) => {
+//     const admin = req.user
 
-    const orders = await order.find().populate({
-        path:"orderItems",
-        populate:{
-            path:"product",
-            populate:{
-                path:"images",
-            }
-        }
-    })
-    try {
-        if (admin) {
-            res.render("admin/pages/dashboard",{ title: "Dashboard",orders });
-        } else {
-            res.redirect("/admin/login");
-        }
+//     const orders = await order.find().populate({
+//         path:"orderItems",
+//         populate:{
+//             path:"product",
+//             populate:{
+//                 path:"images",
+//             }
+//         }
+//     })
+//     try {
+//         if (admin) {
+//             res.render("admin/pages/dashboard",{ title: "Dashboard",orders });
+//         } else {
+//             res.redirect("/admin/login");
+//         }
 
     
 
+//     } catch (error) {
+//         throw new Error(error);
+//     }
+// });
+
+exports.homepage = asynchandler(async (req, res) => {
+    try {
+        const user = req?.user;
+        const recentOrders = await order.find().limit(5).populate({
+            path:"user",
+            select:"firstName lastname",
+        }).populate("orderItems").select("totalAmount orderDate totalPrice").sort({_id:-1});
+
+        let totalSalesAmount = 0;
+        recentOrders.forEach((order)=>{
+            totalSalesAmount += order.totalPrice;
+        });
+
+        totalSalesAmount = numeral(totalSalesAmount).format("0.0a");
+
+        
+
+        const totalOrderCount = await order.countDocuments();
+        const totalActiveUserCount = await User.countDocuments({ isBlocked: false });
+        res.render("admin/pages/dashboard", { title: "Dashboard",user,recentOrders,totalSalesAmount,totalOrderCount,totalActiveUserCount,});
     } catch (error) {
         throw new Error(error);
     }
 });
+
 
 // exports.dashboard = asynchandler(async(req,res)=>{
 //     try {
