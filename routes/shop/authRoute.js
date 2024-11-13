@@ -12,7 +12,6 @@ router.use((req, res, next) => {
 })
 
 
-
 router.get('/login',authController.loadLogin);
 router.get('/register',authController.loadReg);
 router.get("/logout", ensureLoggedIn({redirectTo:"/login"}), authController.logoutUser);
